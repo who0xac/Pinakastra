@@ -9,13 +9,13 @@ import (
 	"github.com/fatih/color"
 )
 
-//go:embed ../../../configs/resolvers.txt
+//go:embed ../../configs/resolvers.txt
 var embeddedResolvers []byte
 
-//go:embed ../../../configs/wordlists/subdomains.txt
+//go:embed ../../configs/wordlists/subdomains.txt
 var embeddedSubdomains []byte
 
-//go:embed ../../../configs/wordlists/directories.txt
+//go:embed ../../configs/wordlists/directories.txt
 var embeddedDirectories []byte
 
 // Setup creates necessary directories and downloads required files on first run

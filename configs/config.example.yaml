@@ -3,12 +3,12 @@
 
 # API Keys
 api_keys:
-  telegram_bot_token: ""
-  telegram_chat_id: ""
   shodan_api_key: ""
   chaos_api_key: ""
   github_token: ""
   gitlab_token: ""
+  telegram_bot_token: ""
+  telegram_chat_id: ""
 
 # Paths
 paths:

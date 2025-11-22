@@ -23,11 +23,12 @@ func NewRegistry(cfg *config.Config) *Registry {
 }
 
 func (r *Registry) registerDefaultTools() {
-	// Placeholder - tools will be registered here
-	// Example:
-	// r.Register(NewSubfinder(r.config))
-	// r.Register(NewAmass(r.config))
-	// r.Register(NewHttpx(r.config))
+	// Phase 1: Subdomain Enumeration
+	r.Register(NewSubfinder(r.config))
+	r.Register(NewAmass(r.config))
+
+	// Phase 4: HTTP Probing
+	r.Register(NewHttpx(r.config))
 }
 
 func (r *Registry) Register(tool Tool) {

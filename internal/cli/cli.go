@@ -42,10 +42,8 @@ func init() {
 	rootCmd.Flags().BoolVar(&enableNotify, "nt", false, "Enable notifications")
 
 	checkToolsCmd.Aliases = []string{"c"}
-	webuiCmd.Aliases = []string{"w"}
 
 	rootCmd.AddCommand(checkToolsCmd)
-	rootCmd.AddCommand(webuiCmd)
 
 	rootCmd.CompletionOptions.HiddenDefaultCmd = true
 	rootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
@@ -65,9 +63,7 @@ func showHelp() {
 	fmt.Printf("  %-20s %s\n", cyan.Sprint("-d, --domain"), "Target domain")
 	fmt.Printf("  %-20s %s\n", cyan.Sprint("-o, --output"), "Output directory")
 	fmt.Printf("  %-20s %s\n", cyan.Sprint("--nt"), "Enable notifications")
-	fmt.Printf("  %-20s %s\n", cyan.Sprint("-c"), "Check tools")
-	fmt.Printf("  %-20s %s\n", cyan.Sprint("-w"), "Start web UI")
-	fmt.Printf("  %-20s %s\n", cyan.Sprint("-p, --port"), "Web UI port (default: 9000)")
+	fmt.Printf("  %-20s %s\n", cyan.Sprint("-c, --check"), "Check installed tools")
 	fmt.Printf("  %-20s %s\n", cyan.Sprint("-h, --help"), "Help")
 	fmt.Println()
 
@@ -76,7 +72,6 @@ func showHelp() {
 	white.Println("  pinakastra -d example.com --nt")
 	white.Println("  pinakastra -d example.com -o /output")
 	white.Println("  pinakastra -c")
-	white.Println("  pinakastra -w -p 8080")
 	fmt.Println()
 }
 

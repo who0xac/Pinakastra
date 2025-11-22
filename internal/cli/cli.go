@@ -14,6 +14,7 @@ var (
 	enableNotify bool
 	checkTools   bool
 	showHelpFlag bool
+	updateFlag   bool
 )
 
 var rootCmd = &cobra.Command{
@@ -30,6 +31,11 @@ var rootCmd = &cobra.Command{
 
 		if showHelpFlag {
 			showHelp()
+			return
+		}
+
+		if updateFlag {
+			runUpdate()
 			return
 		}
 
@@ -55,6 +61,7 @@ func init() {
 	rootCmd.Flags().StringVarP(&outputDir, "output", "o", "", "Output directory")
 	rootCmd.Flags().BoolVar(&enableNotify, "nt", false, "Enable notifications")
 	rootCmd.Flags().BoolVarP(&checkTools, "check", "c", false, "Check installed tools")
+	rootCmd.Flags().BoolVarP(&updateFlag, "update", "u", false, "Update to latest version")
 	rootCmd.Flags().BoolVarP(&showHelpFlag, "help", "h", false, "Show help")
 
 	rootCmd.CompletionOptions.HiddenDefaultCmd = true
@@ -89,6 +96,7 @@ func showHelp() {
 	fmt.Printf("  %-20s %s\n", cyan.Sprint("-o, --output"), "Output directory")
 	fmt.Printf("  %-20s %s\n", cyan.Sprint("--nt"), "Enable notifications")
 	fmt.Printf("  %-20s %s\n", cyan.Sprint("-c, --check"), "Check installed tools")
+	fmt.Printf("  %-20s %s\n", cyan.Sprint("-u, --update"), "Update to latest version")
 	fmt.Printf("  %-20s %s\n", cyan.Sprint("-h, --help"), "Help")
 	fmt.Println()
 
@@ -97,6 +105,7 @@ func showHelp() {
 	white.Println("  pinakastra -d example.com --nt")
 	white.Println("  pinakastra -d example.com -o /output")
 	white.Println("  pinakastra -c")
+	white.Println("  pinakastra -u")
 	fmt.Println()
 }
 

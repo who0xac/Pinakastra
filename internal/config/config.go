@@ -46,8 +46,6 @@ type Notifications struct {
 }
 
 func Load() *Config {
-	baseDir := getBaseDir()
-
 	cfg := &Config{
 		Paths: Paths{
 			Resolvers:           expandPath("~/.config/pinakastra/resolvers.txt"),

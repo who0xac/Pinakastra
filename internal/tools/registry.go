@@ -26,9 +26,26 @@ func (r *Registry) registerDefaultTools() {
 	// Phase 1: Subdomain Enumeration
 	r.Register(NewSubfinder(r.config))
 	r.Register(NewAmass(r.config))
+	r.Register(NewFindomain(r.config))
+	r.Register(NewAssetfinder(r.config))
+
+	// Phase 2: DNS Resolution
+	r.Register(NewDnsx(r.config))
+
+	// Phase 3: Port Scanning
+	r.Register(NewNmap(r.config))
 
 	// Phase 4: HTTP Probing
 	r.Register(NewHttpx(r.config))
+
+	// Phase 5: Content Discovery
+	r.Register(NewGau(r.config))
+	r.Register(NewKatana(r.config))
+	r.Register(NewFfuf(r.config))
+	r.Register(NewDirsearch(r.config))
+
+	// Phase 6: Vulnerability Scanning
+	r.Register(NewNuclei(r.config))
 }
 
 func (r *Registry) Register(tool Tool) {

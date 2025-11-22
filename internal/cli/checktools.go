@@ -44,7 +44,7 @@ func runCheckTools() {
 		"nuclei",
 	}
 
-	results := checkTools(requiredTools)
+	results := checkToolInstallation(requiredTools)
 
 	installed := 0
 	missing := 0
@@ -112,7 +112,7 @@ func runCheckTools() {
 	fmt.Println()
 }
 
-func checkTools(toolNames []string) []CheckResult {
+func checkToolInstallation(toolNames []string) []CheckResult {
 	var results []CheckResult
 
 	for _, name := range toolNames {

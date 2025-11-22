@@ -53,8 +53,6 @@ func (r *Registry) registerDefaultTools() {
 	r.Register(NewHakrawler(r.config))
 	r.Register(NewSubjs(r.config))
 	r.Register(NewArjun(r.config))
-	r.Register(NewGf(r.config))
-	r.Register(NewJq(r.config))
 
 	// Phase 6: Vulnerability Scanning
 	r.Register(NewNuclei(r.config))

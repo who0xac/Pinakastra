@@ -12,9 +12,9 @@ api_keys:
 
 # Paths
 paths:
-  resolvers: "~/.pinakastra/resolvers.txt"
-  subdomains_wordlist: "~/.pinakastra/wordlists/subdomains.txt"
-  directories_wordlist: "~/.pinakastra/wordlists/directories.txt"
+  resolvers: "~/.config/pinakastra/resolvers.txt"
+  subdomains_wordlist: "~/.config/pinakastra/wordlists/subdomains.txt"
+  directories_wordlist: "~/.config/pinakastra/wordlists/directories.txt"
   amass_config: "~/.config/amass/config.yaml"
   jsa_path: "~/tools/JSA"
 

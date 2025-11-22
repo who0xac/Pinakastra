@@ -50,10 +50,10 @@ func Load() *Config {
 
 	cfg := &Config{
 		Paths: Paths{
-			Resolvers:           filepath.Join(baseDir, "configs", "resolvers.txt"),
-			Subdomains:          filepath.Join(baseDir, "configs", "wordlists", "subdomains.txt"),
-			Directories:         filepath.Join(baseDir, "configs", "wordlists", "directories.txt"),
-			DirectoriesWordlist: filepath.Join(baseDir, "configs", "wordlists", "directories.txt"),
+			Resolvers:           expandPath("~/.config/pinakastra/resolvers.txt"),
+			Subdomains:          expandPath("~/.config/pinakastra/wordlists/subdomains.txt"),
+			Directories:         expandPath("~/.config/pinakastra/wordlists/directories.txt"),
+			DirectoriesWordlist: expandPath("~/.config/pinakastra/wordlists/directories.txt"),
 			AmassConfig:         expandPath("~/.config/amass/config.yaml"),
 			JSAPath:             expandPath("~/tools/JSA"),
 		},
@@ -71,7 +71,7 @@ func Load() *Config {
 	// Setup viper to read config file
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath(expandPath("~/.pinakastra"))
+	viper.AddConfigPath(expandPath("~/.config/pinakastra"))
 	viper.AddConfigPath(".")
 
 	// Load config file if it exists

@@ -4,17 +4,17 @@ Pinakastra supports two ways to configure API keys and settings.
 
 ## 1. Using Config File (Recommended)
 
-Create a config file at `~/.pinakastra/config.yaml`:
+Create a config file at `~/.config/pinakastra/config.yaml`:
 
 ```bash
 # Create directory
-mkdir -p ~/.pinakastra
+mkdir -p ~/.config/pinakastra
 
 # Copy example config
-cp configs/config.example.yaml ~/.pinakastra/config.yaml
+cp configs/config.example.yaml ~/.config/pinakastra/config.yaml
 
 # Edit with your API keys
-nano ~/.pinakastra/config.yaml
+nano ~/.config/pinakastra/config.yaml
 ```
 
 ### Config File Format:
@@ -31,9 +31,9 @@ api_keys:
 
 # Paths
 paths:
-  resolvers: "~/.pinakastra/resolvers.txt"
-  subdomains_wordlist: "~/.pinakastra/wordlists/subdomains.txt"
-  directories_wordlist: "~/.pinakastra/wordlists/directories.txt"
+  resolvers: "~/.config/pinakastra/resolvers.txt"
+  subdomains_wordlist: "~/.config/pinakastra/wordlists/subdomains.txt"
+  directories_wordlist: "~/.config/pinakastra/wordlists/directories.txt"
   amass_config: "~/.config/amass/config.yaml"
   jsa_path: "~/tools/JSA"
 
@@ -103,7 +103,7 @@ source ~/.bashrc
 ## Configuration Priority
 
 1. **Environment Variables** (highest priority)
-2. **Config File** (`~/.pinakastra/config.yaml`)
+2. **Config File** (`~/.config/pinakastra/config.yaml`)
 3. **Default Values** (lowest priority)
 
 ## Amass Configuration
@@ -135,19 +135,19 @@ Download recommended wordlists:
 
 ```bash
 # Create wordlists directory
-mkdir -p ~/.pinakastra/wordlists
+mkdir -p ~/.config/pinakastra/wordlists
 
 # Download subdomains wordlist
 wget https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/DNS/subdomains-top1million-110000.txt \
-  -O ~/.pinakastra/wordlists/subdomains.txt
+  -O ~/.config/pinakastra/wordlists/subdomains.txt
 
 # Download directories wordlist
 wget https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/directory-list-2.3-medium.txt \
-  -O ~/.pinakastra/wordlists/directories.txt
+  -O ~/.config/pinakastra/wordlists/directories.txt
 
 # Download resolvers
 wget https://raw.githubusercontent.com/blechschmidt/massdns/master/lists/resolvers.txt \
-  -O ~/.pinakastra/resolvers.txt
+  -O ~/.config/pinakastra/resolvers.txt
 ```
 
 ## Testing Configuration
@@ -166,21 +166,21 @@ pinakastra -d example.com --nt
 #!/bin/bash
 
 # Create directories
-mkdir -p ~/.pinakastra/wordlists
+mkdir -p ~/.config/pinakastra/wordlists
 mkdir -p ~/.config/amass
 
 # Copy config
-cp configs/config.example.yaml ~/.pinakastra/config.yaml
+cp configs/config.example.yaml ~/.config/pinakastra/config.yaml
 
 # Download wordlists
 wget -q https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/DNS/subdomains-top1million-110000.txt \
-  -O ~/.pinakastra/wordlists/subdomains.txt
+  -O ~/.config/pinakastra/wordlists/subdomains.txt
 
 wget -q https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/directory-list-2.3-medium.txt \
-  -O ~/.pinakastra/wordlists/directories.txt
+  -O ~/.config/pinakastra/wordlists/directories.txt
 
 wget -q https://raw.githubusercontent.com/blechschmidt/massdns/master/lists/resolvers.txt \
-  -O ~/.pinakastra/resolvers.txt
+  -O ~/.config/pinakastra/resolvers.txt
 
-echo "✓ Setup complete! Edit ~/.pinakastra/config.yaml to add your API keys"
+echo "✓ Setup complete! Edit ~/.config/pinakastra/config.yaml to add your API keys"
 ```

@@ -48,14 +48,9 @@ func (r *Registry) GetAll() []Tool {
 }
 
 func (r *Registry) GetEnabledTools() []Tool {
-	var enabled []Tool
-	for name, tool := range r.tools {
-		toolCfg := r.config.GetToolConfig(name)
-		if toolCfg.Enabled {
-			enabled = append(enabled, tool)
-		}
-	}
-	return enabled
+	// Return all registered tools as enabled
+	// Tool-specific configuration can be added later if needed
+	return r.GetAll()
 }
 
 func (r *Registry) FilterTools(names []string) []Tool {

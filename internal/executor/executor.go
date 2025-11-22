@@ -8,36 +8,32 @@ import (
 	"github.com/who0xac/pinakastra/internal/logger"
 	"github.com/who0xac/pinakastra/internal/notifier"
 	"github.com/who0xac/pinakastra/internal/tools"
-	"github.com/who0xac/pinakastra/internal/websocket"
 )
 
 type ScanContext struct {
 	Domain    string
 	OutputDir string
 	Config    *config.Config
-	Hub       *websocket.Hub
 	StartTime time.Time
 }
 
 type ToolResult struct {
-	Tool      string        `json:"tool"`
-	Success   bool          `json:"success"`
-	Output    string        `json:"output"`
-	Error     string        `json:"error,omitempty"`
-	Duration  time.Duration `json:"duration"`
-	Findings  int           `json:"findings"`
-	OutputFile string       `json:"output_file,omitempty"`
+	Tool       string        `json:"tool"`
+	Success    bool          `json:"success"`
+	Output     string        `json:"output"`
+	Error      string        `json:"error,omitempty"`
+	Duration   time.Duration `json:"duration"`
+	Findings   int           `json:"findings"`
+	OutputFile string        `json:"output_file,omitempty"`
 }
 
 type Executor struct {
-	hub      *websocket.Hub
 	notifier *notifier.Notifier
 	log      *logger.Logger
 }
 
-func New(hub *websocket.Hub, notifier *notifier.Notifier, log *logger.Logger) *Executor {
+func New(notifier *notifier.Notifier, log *logger.Logger) *Executor {
 	return &Executor{
-		hub:      hub,
 		notifier: notifier,
 		log:      log,
 	}
@@ -65,17 +61,6 @@ func (e *Executor) RunTools(ctx *ScanContext, toolList []tools.Tool) map[string]
 				mu.Lock()
 				results[t.Name()] = result
 				mu.Unlock()
-
-				// Broadcast result to WebSocket clients
-				e.hub.Broadcast(websocket.Message{
-					Type: "tool_complete",
-					Data: map[string]interface{}{
-						"tool":     t.Name(),
-						"success":  result.Success,
-						"findings": result.Findings,
-						"duration": result.Duration.String(),
-					},
-				})
 			}(tool)
 		}
 
@@ -87,15 +72,6 @@ func (e *Executor) RunTools(ctx *ScanContext, toolList []tools.Tool) map[string]
 
 func (e *Executor) runTool(ctx *ScanContext, tool tools.Tool) *ToolResult {
 	e.log.Tool(tool.Name(), "Starting...")
-
-	// Broadcast start
-	e.hub.Broadcast(websocket.Message{
-		Type: "tool_start",
-		Data: map[string]interface{}{
-			"tool":   tool.Name(),
-			"domain": ctx.Domain,
-		},
-	})
 
 	startTime := time.Now()
 

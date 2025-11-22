@@ -28,33 +28,8 @@ func NewTelegramNotifier(botToken, chatID string) *TelegramNotifier {
 	}
 }
 
-func (t *TelegramNotifier) Send(event Event) error {
-	message := t.formatMessage(event)
+func (t *TelegramNotifier) SendMessage(message string) error {
 	return t.sendMessage(message)
-}
-
-func (t *TelegramNotifier) formatMessage(event Event) string {
-	var emoji string
-	switch event.Type {
-	case ScanStart:
-		emoji = "🚀"
-	case ScanComplete:
-		emoji = "✅"
-	case Critical:
-		emoji = "🚨"
-	case Error:
-		emoji = "❌"
-	default:
-		emoji = "ℹ️"
-	}
-
-	msg := fmt.Sprintf("%s *Pinakastra*\n\n", emoji)
-	if event.Domain != "" {
-		msg += fmt.Sprintf("🎯 *Target:* `%s`\n", event.Domain)
-	}
-	msg += fmt.Sprintf("📝 %s", event.Message)
-
-	return msg
 }
 
 func (t *TelegramNotifier) sendMessage(text string) error {

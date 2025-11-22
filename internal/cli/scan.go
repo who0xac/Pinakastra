@@ -12,9 +12,7 @@ import (
 	"github.com/who0xac/pinakastra/internal/executor"
 	"github.com/who0xac/pinakastra/internal/logger"
 	"github.com/who0xac/pinakastra/internal/notifier"
-	"github.com/who0xac/pinakastra/internal/storage"
 	"github.com/who0xac/pinakastra/internal/tools"
-	"github.com/who0xac/pinakastra/internal/websocket"
 )
 
 func runScan(cmd *cobra.Command, args []string) {
@@ -29,18 +27,14 @@ func runScan(cmd *cobra.Command, args []string) {
 		cfg.Notifications.Desktop = false
 	}
 
-	hub := websocket.NewHub()
-	go hub.Run()
-
-	notify := notifier.New(cfg, hub)
-	store := storage.New(cfg.Storage.BasePath)
+	notify := notifier.New(cfg)
 	registry := tools.NewRegistry(cfg)
-	exec := executor.New(hub, notify, log)
+	exec := executor.New(notify, log)
 
-	scanDomain(domain, cfg, exec, registry, store, notify, hub, log)
+	scanDomain(domain, cfg, exec, registry, notify, log)
 }
 
-func scanDomain(targetDomain string, cfg *config.Config, exec *executor.Executor, registry *tools.Registry, store *storage.Storage, notify *notifier.Notifier, hub *websocket.Hub, log *logger.Logger) {
+func scanDomain(targetDomain string, cfg *config.Config, exec *executor.Executor, registry *tools.Registry, notify *notifier.Notifier, log *logger.Logger) {
 	startTime := time.Now()
 
 	outDir := outputDir
@@ -52,11 +46,7 @@ func scanDomain(targetDomain string, cfg *config.Config, exec *executor.Executor
 		return
 	}
 
-	notify.Send(notifier.Event{
-		Type:    notifier.ScanStart,
-		Domain:  targetDomain,
-		Message: fmt.Sprintf("Starting reconnaissance on %s", targetDomain),
-	})
+	notify.SendStart(targetDomain)
 
 	log.Info("Starting scan for: %s", color.CyanString(targetDomain))
 	log.Info("Output directory: %s", color.YellowString(outDir))
@@ -67,24 +57,14 @@ func scanDomain(targetDomain string, cfg *config.Config, exec *executor.Executor
 		Domain:    targetDomain,
 		OutputDir: outDir,
 		Config:    cfg,
-		Hub:       hub,
 		StartTime: startTime,
 	}
 
-	results := exec.RunTools(ctx, toolsToRun)
-
-	if err := store.SaveResults(targetDomain, results); err != nil {
-		log.Error("Failed to save results: %v", err)
-	}
+	exec.RunTools(ctx, toolsToRun)
 
 	duration := time.Since(startTime)
 
-	notify.Send(notifier.Event{
-		Type:    notifier.ScanComplete,
-		Domain:  targetDomain,
-		Message: fmt.Sprintf("Scan completed for %s in %s", targetDomain, duration.Round(time.Second)),
-		Data:    results,
-	})
+	notify.SendComplete(targetDomain, duration)
 
 	log.Success("Scan completed in %s", duration.Round(time.Second))
 }

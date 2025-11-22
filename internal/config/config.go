@@ -10,20 +10,19 @@ import (
 )
 
 type Config struct {
-	APIKeys   APIKeys   `mapstructure:"api_keys"`
-	Paths     Paths     `mapstructure:"paths"`
-	Storage   Storage   `mapstructure:"storage"`
-	WebUI     WebUI     `mapstructure:"webui"`
-	Notify    Notify    `mapstructure:"notifications"`
+	APIKeys       APIKeys       `mapstructure:"api_keys"`
+	Paths         Paths         `mapstructure:"paths"`
+	Storage       Storage       `mapstructure:"storage"`
+	Notifications Notifications `mapstructure:"notifications"`
 }
 
 type APIKeys struct {
-	GitHub    string `mapstructure:"github_token"`
-	GitLab    string `mapstructure:"gitlab_token"`
-	Shodan    string `mapstructure:"shodan_api_key"`
-	Chaos     string `mapstructure:"chaos_api_key"`
-	Telegram  string `mapstructure:"telegram_bot_token"`
-	ChatID    string `mapstructure:"telegram_chat_id"`
+	GitHub           string `mapstructure:"github_token"`
+	GitLab           string `mapstructure:"gitlab_token"`
+	Shodan           string `mapstructure:"shodan_api_key"`
+	Chaos            string `mapstructure:"chaos_api_key"`
+	TelegramBotToken string `mapstructure:"telegram_bot_token"`
+	TelegramChatID   string `mapstructure:"telegram_chat_id"`
 }
 
 type Paths struct {
@@ -39,13 +38,11 @@ type Storage struct {
 	BasePath string `mapstructure:"base_path"`
 }
 
-type WebUI struct {
-	Port int `mapstructure:"port"`
-}
-
-type Notify struct {
-	Telegram bool `mapstructure:"telegram"`
-	Desktop  bool `mapstructure:"desktop"`
+type Notifications struct {
+	Telegram       bool   `mapstructure:"telegram"`
+	Desktop        bool   `mapstructure:"desktop"`
+	TelegramBotToken string `mapstructure:"telegram_bot_token"`
+	TelegramChatID   string `mapstructure:"telegram_chat_id"`
 }
 
 func Load() *Config {
@@ -63,12 +60,11 @@ func Load() *Config {
 		Storage: Storage{
 			BasePath: expandPath("~/recon-results"),
 		},
-		WebUI: WebUI{
-			Port: 9000,
-		},
-		Notify: Notify{
-			Telegram: false,
-			Desktop:  false,
+		Notifications: Notifications{
+			Telegram:         false,
+			Desktop:          false,
+			TelegramBotToken: "",
+			TelegramChatID:   "",
 		},
 	}
 
@@ -77,8 +73,8 @@ func Load() *Config {
 	cfg.APIKeys.GitLab = os.Getenv("GITLAB_TOKEN")
 	cfg.APIKeys.Shodan = os.Getenv("SHODAN_API_KEY")
 	cfg.APIKeys.Chaos = os.Getenv("CHAOS_API_KEY")
-	cfg.APIKeys.Telegram = os.Getenv("TELEGRAM_BOT_TOKEN")
-	cfg.APIKeys.ChatID = os.Getenv("TELEGRAM_CHAT_ID")
+	cfg.APIKeys.TelegramBotToken = os.Getenv("TELEGRAM_BOT_TOKEN")
+	cfg.APIKeys.TelegramChatID = os.Getenv("TELEGRAM_CHAT_ID")
 
 	// Override from config file if exists
 	if err := viper.Unmarshal(cfg); err == nil {

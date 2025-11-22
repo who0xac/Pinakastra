@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -53,7 +54,7 @@ func Load() *Config {
 			Directories:         expandPath("~/.config/pinakastra/wordlists/directories.txt"),
 			DirectoriesWordlist: expandPath("~/.config/pinakastra/wordlists/directories.txt"),
 			AmassConfig:         expandPath("~/.config/amass/config.yaml"),
-			JSAPath:             "", // User must specify if using JSA
+			JSAPath:             findJSAPath(), // Auto-detect JSA installation
 		},
 		Storage: Storage{
 			BasePath: expandPath("~/recon-results"),
@@ -148,4 +149,31 @@ func (c *Config) GetDirectoriesWordlist() string {
 
 func (c *Config) GetOutputDir(domain string) string {
 	return filepath.Join(c.Storage.BasePath, domain)
+}
+
+// findJSAPath attempts to auto-detect JSA installation
+func findJSAPath() string {
+	// Common installation paths for JSA
+	commonPaths := []string{
+		"~/tools/JSA",
+		"~/JSA",
+		"/opt/JSA",
+		"/usr/local/JSA",
+		"~/.local/share/JSA",
+	}
+
+	for _, path := range commonPaths {
+		expandedPath := expandPath(path)
+		if _, err := os.Stat(expandedPath); err == nil {
+			return expandedPath
+		}
+	}
+
+	// Check if JSA is in PATH
+	if jsaPath, err := exec.LookPath("jsa"); err == nil {
+		// Get directory of jsa executable
+		return filepath.Dir(jsaPath)
+	}
+
+	return "" // Not found
 }

@@ -68,24 +68,47 @@ func Load() *Config {
 		},
 	}
 
-	// Load from env
-	cfg.APIKeys.GitHub = os.Getenv("GITHUB_TOKEN")
-	cfg.APIKeys.GitLab = os.Getenv("GITLAB_TOKEN")
-	cfg.APIKeys.Shodan = os.Getenv("SHODAN_API_KEY")
-	cfg.APIKeys.Chaos = os.Getenv("CHAOS_API_KEY")
-	cfg.APIKeys.TelegramBotToken = os.Getenv("TELEGRAM_BOT_TOKEN")
-	cfg.APIKeys.TelegramChatID = os.Getenv("TELEGRAM_CHAT_ID")
+	// Setup viper to read config file
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(expandPath("~/.pinakastra"))
+	viper.AddConfigPath(".")
 
-	// Override from config file if exists
-	if err := viper.Unmarshal(cfg); err == nil {
-		cfg.Paths.Resolvers = expandPath(cfg.Paths.Resolvers)
-		cfg.Paths.Subdomains = expandPath(cfg.Paths.Subdomains)
-		cfg.Paths.Directories = expandPath(cfg.Paths.Directories)
-		cfg.Paths.DirectoriesWordlist = expandPath(cfg.Paths.DirectoriesWordlist)
-		cfg.Paths.AmassConfig = expandPath(cfg.Paths.AmassConfig)
-		cfg.Paths.JSAPath = expandPath(cfg.Paths.JSAPath)
-		cfg.Storage.BasePath = expandPath(cfg.Storage.BasePath)
+	// Load config file if it exists
+	if err := viper.ReadInConfig(); err == nil {
+		viper.Unmarshal(cfg)
 	}
+
+	// Override with environment variables (env takes priority over file)
+	if token := os.Getenv("GITHUB_TOKEN"); token != "" {
+		cfg.APIKeys.GitHub = token
+	}
+	if token := os.Getenv("GITLAB_TOKEN"); token != "" {
+		cfg.APIKeys.GitLab = token
+	}
+	if token := os.Getenv("SHODAN_API_KEY"); token != "" {
+		cfg.APIKeys.Shodan = token
+	}
+	if token := os.Getenv("CHAOS_API_KEY"); token != "" {
+		cfg.APIKeys.Chaos = token
+	}
+	if token := os.Getenv("TELEGRAM_BOT_TOKEN"); token != "" {
+		cfg.Notifications.TelegramBotToken = token
+		cfg.APIKeys.TelegramBotToken = token
+	}
+	if chatID := os.Getenv("TELEGRAM_CHAT_ID"); chatID != "" {
+		cfg.Notifications.TelegramChatID = chatID
+		cfg.APIKeys.TelegramChatID = chatID
+	}
+
+	// Expand all paths
+	cfg.Paths.Resolvers = expandPath(cfg.Paths.Resolvers)
+	cfg.Paths.Subdomains = expandPath(cfg.Paths.Subdomains)
+	cfg.Paths.Directories = expandPath(cfg.Paths.Directories)
+	cfg.Paths.DirectoriesWordlist = expandPath(cfg.Paths.DirectoriesWordlist)
+	cfg.Paths.AmassConfig = expandPath(cfg.Paths.AmassConfig)
+	cfg.Paths.JSAPath = expandPath(cfg.Paths.JSAPath)
+	cfg.Storage.BasePath = expandPath(cfg.Storage.BasePath)
 
 	return cfg
 }

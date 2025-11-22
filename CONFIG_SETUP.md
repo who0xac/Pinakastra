@@ -35,7 +35,7 @@ paths:
   subdomains_wordlist: "~/.config/pinakastra/wordlists/subdomains.txt"
   directories_wordlist: "~/.config/pinakastra/wordlists/directories.txt"
   amass_config: "~/.config/amass/config.yaml"
-  jsa_path: "~/tools/JSA"
+  jsa_path: ""  # Optional: Path to JSA (JavaScript Analyzer) if installed
 
 # Storage
 storage:

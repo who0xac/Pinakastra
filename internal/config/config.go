@@ -53,7 +53,7 @@ func Load() *Config {
 			Directories:         expandPath("~/.config/pinakastra/wordlists/directories.txt"),
 			DirectoriesWordlist: expandPath("~/.config/pinakastra/wordlists/directories.txt"),
 			AmassConfig:         expandPath("~/.config/amass/config.yaml"),
-			JSAPath:             expandPath("~/tools/JSA"),
+			JSAPath:             "", // User must specify if using JSA
 		},
 		Storage: Storage{
 			BasePath: expandPath("~/recon-results"),

@@ -57,23 +57,39 @@ func Setup() error {
 		green.Println(" ✓")
 	}
 
-	// Download wordlists
-	cyan.Print("  [4/4] Downloading wordlists (this may take a moment)...")
+	// Copy wordlists from bundled configs
+	cyan.Print("  [4/4] Copying wordlists...")
 
+	// Get the executable directory to find bundled configs
+	baseDir := getBaseDir()
+	bundledWordlistsDir := filepath.Join(baseDir, "configs", "wordlists")
+
+	// Copy subdomains wordlist
 	subdomainsFile := filepath.Join(wordlistsDir, "subdomains.txt")
-	if err := downloadFile(
-		"https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/DNS/subdomains-top1million-110000.txt",
-		subdomainsFile,
-	); err != nil {
-		yellow.Printf(" ⚠ Subdomains wordlist failed\n")
+	bundledSubdomains := filepath.Join(bundledWordlistsDir, "subdomains.txt")
+	if err := copyFile(bundledSubdomains, subdomainsFile); err != nil {
+		// Fallback to download if bundled file not found
+		if err := downloadFile(
+			"https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/DNS/subdomains-top1million-110000.txt",
+			subdomainsFile,
+		); err != nil {
+			yellow.Printf(" ⚠ Subdomains wordlist failed\n")
+		}
 	}
 
+	// Copy directories wordlist
 	directoriesFile := filepath.Join(wordlistsDir, "directories.txt")
-	if err := downloadFile(
-		"https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/directory-list-2.3-medium.txt",
-		directoriesFile,
-	); err != nil {
-		yellow.Printf(" ⚠ Directories wordlist failed\n")
+	bundledDirectories := filepath.Join(bundledWordlistsDir, "directories.txt")
+	if err := copyFile(bundledDirectories, directoriesFile); err != nil {
+		// Fallback to download if bundled file not found
+		if err := downloadFile(
+			"https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/directory-list-2.3-medium.txt",
+			directoriesFile,
+		); err != nil {
+			yellow.Printf(" ⚠ Directories wordlist failed\n")
+		} else {
+			green.Println(" ✓")
+		}
 	} else {
 		green.Println(" ✓")
 	}
@@ -164,4 +180,21 @@ func downloadFile(url, filepath string) error {
 func fileExists(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil
+}
+
+func copyFile(src, dst string) error {
+	sourceFile, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer sourceFile.Close()
+
+	destFile, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer destFile.Close()
+
+	_, err = io.Copy(destFile, sourceFile)
+	return err
 }

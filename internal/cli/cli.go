@@ -56,6 +56,12 @@ func init() {
 	rootCmd.SilenceUsage = true
 	rootCmd.SilenceErrors = true
 	rootCmd.DisableFlagsInUseLine = true
+
+	// Override help function
+	rootCmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
+		printBanner()
+		showHelp()
+	})
 }
 
 func showHelp() {

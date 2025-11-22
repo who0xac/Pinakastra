@@ -8,10 +8,9 @@ import (
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/who0xac/pinakastra/internal/config"
-	"github.com/who0xac/pinakastra/internal/executor"
 	"github.com/who0xac/pinakastra/internal/logger"
 	"github.com/who0xac/pinakastra/internal/notifier"
-	"github.com/who0xac/pinakastra/internal/tools"
+	"github.com/who0xac/pinakastra/internal/recon"
 )
 
 func runScan(cmd *cobra.Command, args []string) {
@@ -27,13 +26,11 @@ func runScan(cmd *cobra.Command, args []string) {
 	}
 
 	notify := notifier.New(cfg)
-	registry := tools.NewRegistry(cfg)
-	exec := executor.New(notify, log)
 
-	scanDomain(domain, cfg, exec, registry, notify, log)
+	scanDomain(domain, cfg, notify, log)
 }
 
-func scanDomain(targetDomain string, cfg *config.Config, exec *executor.Executor, registry *tools.Registry, notify *notifier.Notifier, log *logger.Logger) {
+func scanDomain(targetDomain string, cfg *config.Config, notify *notifier.Notifier, log *logger.Logger) {
 	startTime := time.Now()
 
 	outDir := outputDir
@@ -50,16 +47,34 @@ func scanDomain(targetDomain string, cfg *config.Config, exec *executor.Executor
 	log.Info("Starting scan for: %s", color.CyanString(targetDomain))
 	log.Info("Output directory: %s", color.YellowString(outDir))
 
-	toolsToRun := registry.GetEnabledTools()
+	// Step 1: Subdomain Enumeration
+	subdomainEnum := recon.NewSubdomainEnum(targetDomain, outDir, cfg)
+	subdomainEnum.Run()
+	subdomainEnum.MergeAndClean()
 
-	ctx := &executor.ScanContext{
-		Domain:    targetDomain,
-		OutputDir: outDir,
-		Config:    cfg,
-		StartTime: startTime,
-	}
+	// Step 2: Live Host Probing
+	liveHost := recon.NewLiveHostProbe(outDir)
+	liveHost.Run()
 
-	exec.RunTools(ctx, toolsToRun)
+	// Step 3: DNS Resolution
+	resolver := recon.NewIPResolver(outDir)
+	resolver.Run()
+
+	// Step 4: URL Gathering
+	urlGathering := recon.NewURLGathering(targetDomain, outDir)
+	urlGathering.Run()
+
+	// Step 5: GF Pattern Matching
+	gfPatterns := recon.NewGFPatterns(targetDomain, outDir)
+	gfPatterns.Run()
+
+	// Step 6: API Endpoint Discovery
+	apiEndpoints := recon.NewAPIEndpointFinder(targetDomain, outDir)
+	apiEndpoints.Run()
+
+	// Step 7: Nuclei Vulnerability Scanning
+	nuclei := recon.NewNucleiScanner(targetDomain, outDir)
+	nuclei.Run()
 
 	duration := time.Since(startTime)
 

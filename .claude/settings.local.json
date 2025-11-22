@@ -4,7 +4,8 @@
       "Bash(go mod tidy:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push)"
+      "Bash(git push)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []

@@ -2,13 +2,17 @@ package cli
 
 import (
 	"fmt"
+	"os/exec"
 
 	"github.com/fatih/color"
-	"github.com/who0xac/pinakastra/internal/tools"
 )
 
-func runCheckTools() {
+type CheckResult struct {
+	Name      string
+	Installed bool
+}
 
+func runCheckTools() {
 	cyan := color.New(color.FgCyan, color.Bold)
 	green := color.New(color.FgGreen, color.Bold)
 	red := color.New(color.FgRed, color.Bold)
@@ -21,12 +25,30 @@ func runCheckTools() {
 	cyan.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 	fmt.Println()
 
-	checker := tools.NewChecker()
-	results := checker.CheckAll()
+	// List of all required tools
+	requiredTools := []string{
+		"amass",
+		"subfinder",
+		"findomain",
+		"assetfinder",
+		"sublist3r",
+		"chaos",
+		"crtsh",
+		"shodan",
+		"puredns",
+		"httpx",
+		"dnsx",
+		"katana",
+		"gau",
+		"gf",
+		"nuclei",
+	}
+
+	results := checkTools(requiredTools)
 
 	installed := 0
 	missing := 0
-	var missingTools []tools.CheckResult
+	var missingTools []CheckResult
 
 	for i, result := range results {
 		// Progress indicator
@@ -88,4 +110,18 @@ func runCheckTools() {
 	}
 
 	fmt.Println()
+}
+
+func checkTools(toolNames []string) []CheckResult {
+	var results []CheckResult
+
+	for _, name := range toolNames {
+		_, err := exec.LookPath(name)
+		results = append(results, CheckResult{
+			Name:      name,
+			Installed: err == nil,
+		})
+	}
+
+	return results
 }

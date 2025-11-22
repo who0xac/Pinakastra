@@ -90,11 +90,7 @@ func (e *Executor) runTool(ctx *ScanContext, tool tools.Tool) *ToolResult {
 		e.log.Error("%s failed: %v", tool.Name(), err)
 
 		// Notify error
-		e.notifier.Send(notifier.Event{
-			Type:    notifier.Error,
-			Domain:  ctx.Domain,
-			Message: tool.Name() + " failed: " + err.Error(),
-		})
+		e.notifier.SendError(ctx.Domain, tool.Name()+" failed: "+err.Error())
 	} else {
 		result.Success = true
 		result.Output = output

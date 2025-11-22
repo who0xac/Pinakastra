@@ -28,24 +28,38 @@ func (r *Registry) registerDefaultTools() {
 	r.Register(NewAmass(r.config))
 	r.Register(NewFindomain(r.config))
 	r.Register(NewAssetfinder(r.config))
+	r.Register(NewSublist3r(r.config))
+	r.Register(NewCrtsh(r.config))
+	r.Register(NewChaos(r.config))
 
 	// Phase 2: DNS Resolution
 	r.Register(NewDnsx(r.config))
+	r.Register(NewPuredns(r.config))
+	r.Register(NewMassdns(r.config))
 
 	// Phase 3: Port Scanning
 	r.Register(NewNmap(r.config))
+	r.Register(NewShodan(r.config))
 
 	// Phase 4: HTTP Probing
 	r.Register(NewHttpx(r.config))
+	r.Register(NewGowitness(r.config))
 
 	// Phase 5: Content Discovery
 	r.Register(NewGau(r.config))
 	r.Register(NewKatana(r.config))
 	r.Register(NewFfuf(r.config))
 	r.Register(NewDirsearch(r.config))
+	r.Register(NewHakrawler(r.config))
+	r.Register(NewSubjs(r.config))
+	r.Register(NewArjun(r.config))
+	r.Register(NewGf(r.config))
+	r.Register(NewJq(r.config))
 
 	// Phase 6: Vulnerability Scanning
 	r.Register(NewNuclei(r.config))
+	r.Register(NewSubzy(r.config))
+	r.Register(NewSecretfinder(r.config))
 }
 
 func (r *Registry) Register(tool Tool) {

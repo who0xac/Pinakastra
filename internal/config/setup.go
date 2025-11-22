@@ -1,14 +1,22 @@
 package config
 
 import (
+	_ "embed"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 	"path/filepath"
 
 	"github.com/fatih/color"
 )
+
+//go:embed ../../../configs/resolvers.txt
+var embeddedResolvers []byte
+
+//go:embed ../../../configs/wordlists/subdomains.txt
+var embeddedSubdomains []byte
+
+//go:embed ../../../configs/wordlists/directories.txt
+var embeddedDirectories []byte
 
 // Setup creates necessary directories and downloads required files on first run
 func Setup() error {
@@ -45,51 +53,28 @@ func Setup() error {
 	}
 	green.Println(" ✓")
 
-	// Download resolvers
-	cyan.Print("  [3/4] Downloading DNS resolvers...")
+	// Create resolvers file from embedded content
+	cyan.Print("  [3/4] Creating DNS resolvers file...")
 	resolversFile := filepath.Join(configDir, "resolvers.txt")
-	if err := downloadFile(
-		"https://raw.githubusercontent.com/blechschmidt/massdns/master/lists/resolvers.txt",
-		resolversFile,
-	); err != nil {
+	if err := os.WriteFile(resolversFile, embeddedResolvers, 0644); err != nil {
 		yellow.Printf(" ⚠ Failed (you can add manually)\n")
 	} else {
 		green.Println(" ✓")
 	}
 
-	// Copy wordlists from bundled configs
-	cyan.Print("  [4/4] Copying wordlists...")
+	// Create wordlists from embedded content
+	cyan.Print("  [4/4] Creating wordlists...")
 
-	// Get the executable directory to find bundled configs
-	baseDir := getBaseDir()
-	bundledWordlistsDir := filepath.Join(baseDir, "configs", "wordlists")
-
-	// Copy subdomains wordlist
+	// Create subdomains wordlist
 	subdomainsFile := filepath.Join(wordlistsDir, "subdomains.txt")
-	bundledSubdomains := filepath.Join(bundledWordlistsDir, "subdomains.txt")
-	if err := copyFile(bundledSubdomains, subdomainsFile); err != nil {
-		// Fallback to download if bundled file not found
-		if err := downloadFile(
-			"https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/DNS/subdomains-top1million-110000.txt",
-			subdomainsFile,
-		); err != nil {
-			yellow.Printf(" ⚠ Subdomains wordlist failed\n")
-		}
+	if err := os.WriteFile(subdomainsFile, embeddedSubdomains, 0644); err != nil {
+		yellow.Printf(" ⚠ Subdomains wordlist failed\n")
 	}
 
-	// Copy directories wordlist
+	// Create directories wordlist
 	directoriesFile := filepath.Join(wordlistsDir, "directories.txt")
-	bundledDirectories := filepath.Join(bundledWordlistsDir, "directories.txt")
-	if err := copyFile(bundledDirectories, directoriesFile); err != nil {
-		// Fallback to download if bundled file not found
-		if err := downloadFile(
-			"https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/directory-list-2.3-medium.txt",
-			directoriesFile,
-		); err != nil {
-			yellow.Printf(" ⚠ Directories wordlist failed\n")
-		} else {
-			green.Println(" ✓")
-		}
+	if err := os.WriteFile(directoriesFile, embeddedDirectories, 0644); err != nil {
+		yellow.Printf(" ⚠ Directories wordlist failed\n")
 	} else {
 		green.Println(" ✓")
 	}
@@ -156,45 +141,7 @@ notifications:
 	return os.WriteFile(path, []byte(configContent), 0644)
 }
 
-func downloadFile(url, filepath string) error {
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("bad status: %s", resp.Status)
-	}
-
-	out, err := os.Create(filepath)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
-	_, err = io.Copy(out, resp.Body)
-	return err
-}
-
 func fileExists(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil
-}
-
-func copyFile(src, dst string) error {
-	sourceFile, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer sourceFile.Close()
-
-	destFile, err := os.Create(dst)
-	if err != nil {
-		return err
-	}
-	defer destFile.Close()
-
-	_, err = io.Copy(destFile, sourceFile)
-	return err
 }

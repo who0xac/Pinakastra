@@ -5,6 +5,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
+	"github.com/who0xac/pinakastra/internal/config"
 )
 
 var (
@@ -21,6 +22,11 @@ var rootCmd = &cobra.Command{
 	DisableFlagParsing: false,
 	Run: func(cmd *cobra.Command, args []string) {
 		printBanner()
+
+		// Run first-time setup if needed
+		if err := config.Setup(); err != nil {
+			fmt.Printf("Setup failed: %v\n", err)
+		}
 
 		if showHelpFlag {
 			showHelp()

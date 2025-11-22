@@ -16,8 +16,9 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "pinakastra",
-	Short: "Pinakastra - Automated Reconnaissance Framework",
+	Use:               "pinakastra",
+	Short:             "Pinakastra - Automated Reconnaissance Framework",
+	DisableFlagParsing: false,
 	Run: func(cmd *cobra.Command, args []string) {
 		printBanner()
 
@@ -53,6 +54,8 @@ func init() {
 	rootCmd.CompletionOptions.HiddenDefaultCmd = true
 	rootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
 	rootCmd.SilenceUsage = true
+	rootCmd.SilenceErrors = true
+	rootCmd.DisableFlagsInUseLine = true
 }
 
 func showHelp() {

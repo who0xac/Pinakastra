@@ -12,6 +12,7 @@ var (
 	outputDir    string
 	enableNotify bool
 	checkTools   bool
+	showHelpFlag bool
 )
 
 var rootCmd = &cobra.Command{
@@ -19,6 +20,11 @@ var rootCmd = &cobra.Command{
 	Short: "Pinakastra - Automated Reconnaissance Framework",
 	Run: func(cmd *cobra.Command, args []string) {
 		printBanner()
+
+		if showHelpFlag {
+			showHelp()
+			return
+		}
 
 		if checkTools {
 			runCheckTools()
@@ -42,9 +48,11 @@ func init() {
 	rootCmd.Flags().StringVarP(&outputDir, "output", "o", "", "Output directory")
 	rootCmd.Flags().BoolVar(&enableNotify, "nt", false, "Enable notifications")
 	rootCmd.Flags().BoolVarP(&checkTools, "check", "c", false, "Check installed tools")
+	rootCmd.Flags().BoolVarP(&showHelpFlag, "help", "h", false, "Show help")
 
 	rootCmd.CompletionOptions.HiddenDefaultCmd = true
 	rootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
+	rootCmd.SilenceUsage = true
 }
 
 func showHelp() {

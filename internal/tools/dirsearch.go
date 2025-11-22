@@ -20,7 +20,7 @@ func NewDirsearch(cfg *config.Config) *Dirsearch {
 		BaseTool: BaseTool{
 			ToolName:  "dirsearch",
 			ToolDesc:  "Web path scanner",
-			ToolPhase: 5,
+			ToolPhase: 7,
 			Command:   "dirsearch",
 			Timeout:   15 * time.Minute,
 			OutputExt: ".txt",

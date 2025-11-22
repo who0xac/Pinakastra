@@ -20,7 +20,7 @@ func NewSubzy(cfg *config.Config) *Subzy {
 		BaseTool: BaseTool{
 			ToolName:  "subzy",
 			ToolDesc:  "Subdomain takeover vulnerability checker",
-			ToolPhase: 6,
+			ToolPhase: 8,
 			Command:   "subzy",
 			Timeout:   10 * time.Minute,
 			OutputExt: ".txt",

@@ -140,12 +140,14 @@ func groupByPhase(toolList []tools.Tool) []Phase {
 		2: "DNS Resolution",
 		3: "Port Scanning",
 		4: "HTTP Probing",
-		5: "Content Discovery",
-		6: "Vulnerability Scanning",
+		5: "URL Collection",
+		6: "Pattern Analysis",
+		7: "Content Discovery",
+		8: "Vulnerability Scanning",
 	}
 
 	var phases []Phase
-	for i := 1; i <= 6; i++ {
+	for i := 1; i <= 8; i++ {
 		if tools, ok := phaseMap[i]; ok {
 			phases = append(phases, Phase{
 				Name:  phaseNames[i],

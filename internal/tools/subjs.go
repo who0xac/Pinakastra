@@ -20,7 +20,7 @@ func NewSubjs(cfg *config.Config) *Subjs {
 		BaseTool: BaseTool{
 			ToolName:  "subjs",
 			ToolDesc:  "Fetches javascript files from URLs",
-			ToolPhase: 5,
+			ToolPhase: 7,
 			Command:   "subjs",
 			Timeout:   10 * time.Minute,
 			OutputExt: ".txt",

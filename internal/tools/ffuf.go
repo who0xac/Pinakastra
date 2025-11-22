@@ -20,7 +20,7 @@ func NewFfuf(cfg *config.Config) *Ffuf {
 		BaseTool: BaseTool{
 			ToolName:  "ffuf",
 			ToolDesc:  "Fast web fuzzer",
-			ToolPhase: 5,
+			ToolPhase: 7,
 			Command:   "ffuf",
 			Timeout:   15 * time.Minute,
 			OutputExt: ".txt",

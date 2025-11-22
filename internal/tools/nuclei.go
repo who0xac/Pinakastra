@@ -20,7 +20,7 @@ func NewNuclei(cfg *config.Config) *Nuclei {
 		BaseTool: BaseTool{
 			ToolName:  "nuclei",
 			ToolDesc:  "Vulnerability scanner based on templates",
-			ToolPhase: 6,
+			ToolPhase: 8,
 			Command:   "nuclei",
 			Timeout:   30 * time.Minute,
 			OutputExt: ".txt",

@@ -20,7 +20,7 @@ func NewSecretfinder(cfg *config.Config) *Secretfinder {
 		BaseTool: BaseTool{
 			ToolName:  "secretfinder",
 			ToolDesc:  "Find sensitive data in HTTP responses",
-			ToolPhase: 6,
+			ToolPhase: 8,
 			Command:   "secretfinder",
 			Timeout:   10 * time.Minute,
 			OutputExt: ".txt",

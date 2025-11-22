@@ -20,7 +20,7 @@ func NewGf(cfg *config.Config) *Gf {
 		BaseTool: BaseTool{
 			ToolName:  "gf",
 			ToolDesc:  "Wrapper around grep for patterns",
-			ToolPhase: 5,
+			ToolPhase: 6,
 			Command:   "gf",
 			Timeout:   5 * time.Minute,
 			OutputExt: ".txt",

@@ -20,7 +20,7 @@ func NewArjun(cfg *config.Config) *Arjun {
 		BaseTool: BaseTool{
 			ToolName:  "arjun",
 			ToolDesc:  "HTTP parameter discovery suite",
-			ToolPhase: 5,
+			ToolPhase: 7,
 			Command:   "arjun",
 			Timeout:   15 * time.Minute,
 			OutputExt: ".txt",

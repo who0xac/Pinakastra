@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"pinakastra/internal/config"
+	"github.com/who0xac/pinakastra/internal/config"
 )
 
 type JSSecretFinder struct {

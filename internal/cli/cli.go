@@ -5,21 +5,26 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var (
-	cfgFile      string
 	domain       string
 	outputDir    string
 	enableNotify bool
+	checkTools   bool
 )
 
 var rootCmd = &cobra.Command{
 	Use:   "pinakastra",
-	Short: "Pinakastra",
+	Short: "Pinakastra - Automated Reconnaissance Framework",
 	Run: func(cmd *cobra.Command, args []string) {
 		printBanner()
+
+		if checkTools {
+			runCheckTools()
+			return
+		}
+
 		if domain == "" {
 			showHelp()
 			return
@@ -33,17 +38,10 @@ func Execute() error {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
-
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file")
-
 	rootCmd.Flags().StringVarP(&domain, "domain", "d", "", "Target domain")
 	rootCmd.Flags().StringVarP(&outputDir, "output", "o", "", "Output directory")
 	rootCmd.Flags().BoolVar(&enableNotify, "nt", false, "Enable notifications")
-
-	checkToolsCmd.Aliases = []string{"c"}
-
-	rootCmd.AddCommand(checkToolsCmd)
+	rootCmd.Flags().BoolVarP(&checkTools, "check", "c", false, "Check installed tools")
 
 	rootCmd.CompletionOptions.HiddenDefaultCmd = true
 	rootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
@@ -75,21 +73,3 @@ func showHelp() {
 	fmt.Println()
 }
 
-func initConfig() {
-	if cfgFile != "" {
-		viper.SetConfigFile(cfgFile)
-	} else {
-		viper.AddConfigPath("$HOME/.pinakastra")
-		viper.AddConfigPath(".")
-		viper.SetConfigName("config")
-		viper.SetConfigType("yaml")
-	}
-
-	viper.AutomaticEnv()
-
-	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			fmt.Printf("Error reading config: %s\n", err)
-		}
-	}
-}

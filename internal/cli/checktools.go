@@ -4,18 +4,10 @@ import (
 	"fmt"
 
 	"github.com/fatih/color"
-	"github.com/spf13/cobra"
 	"github.com/who0xac/pinakastra/internal/tools"
 )
 
-var checkToolsCmd = &cobra.Command{
-	Use:   "check-tools",
-	Short: "Check tools",
-	Run:   runCheckTools,
-}
-
-func runCheckTools(cmd *cobra.Command, args []string) {
-	printBanner()
+func runCheckTools() {
 
 	cyan := color.New(color.FgCyan, color.Bold)
 	green := color.New(color.FgGreen, color.Bold)

@@ -1,7 +1,6 @@
 package config
 
 import (
-	_ "embed"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -9,14 +8,11 @@ import (
 	"github.com/fatih/color"
 )
 
-//go:embed ../../configs/resolvers.txt
-var embeddedResolvers []byte
-
-//go:embed ../../configs/wordlists/subdomains.txt
-var embeddedSubdomains []byte
-
-//go:embed ../../configs/wordlists/directories.txt
-var embeddedDirectories []byte
+var (
+	EmbeddedResolvers   []byte
+	EmbeddedSubdomains  []byte
+	EmbeddedDirectories []byte
+)
 
 // Setup creates necessary directories and downloads required files on first run
 func Setup() error {
@@ -56,7 +52,7 @@ func Setup() error {
 	// Create resolvers file from embedded content
 	cyan.Print("  [3/4] Creating DNS resolvers file...")
 	resolversFile := filepath.Join(configDir, "resolvers.txt")
-	if err := os.WriteFile(resolversFile, embeddedResolvers, 0644); err != nil {
+	if err := os.WriteFile(resolversFile, EmbeddedResolvers, 0644); err != nil {
 		yellow.Printf(" ⚠ Failed (you can add manually)\n")
 	} else {
 		green.Println(" ✓")
@@ -67,13 +63,13 @@ func Setup() error {
 
 	// Create subdomains wordlist
 	subdomainsFile := filepath.Join(wordlistsDir, "subdomains.txt")
-	if err := os.WriteFile(subdomainsFile, embeddedSubdomains, 0644); err != nil {
+	if err := os.WriteFile(subdomainsFile, EmbeddedSubdomains, 0644); err != nil {
 		yellow.Printf(" ⚠ Subdomains wordlist failed\n")
 	}
 
 	// Create directories wordlist
 	directoriesFile := filepath.Join(wordlistsDir, "directories.txt")
-	if err := os.WriteFile(directoriesFile, embeddedDirectories, 0644); err != nil {
+	if err := os.WriteFile(directoriesFile, EmbeddedDirectories, 0644); err != nil {
 		yellow.Printf(" ⚠ Directories wordlist failed\n")
 	} else {
 		green.Println(" ✓")

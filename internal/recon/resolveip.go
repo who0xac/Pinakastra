@@ -9,8 +9,6 @@ import (
 	"regexp"
 	"strings"
 	"time"
-
-	"github.com/fatih/color"
 )
 
 type IPResolver struct {

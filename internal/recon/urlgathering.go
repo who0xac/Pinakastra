@@ -304,18 +304,3 @@ func readFileToMap(filename string, urlMap map[string]bool) {
 		}
 	}
 }
-
-func countLines(filename string) int {
-	file, err := os.Open(filename)
-	if err != nil {
-		return 0
-	}
-	defer file.Close()
-
-	count := 0
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		count++
-	}
-	return count
-}

@@ -8,8 +8,6 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-
-	"github.com/fatih/color"
 )
 
 type LiveHostProbe struct {

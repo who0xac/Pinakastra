@@ -12,7 +12,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fatih/color"
 	"github.com/who0xac/pinakastra/internal/config"
 )
 
@@ -348,29 +347,4 @@ func (s *SubdomainEnum) cleanAmassOutput(input, output string) {
 	}
 
 	os.WriteFile(output, []byte(strings.Join(cleaned, "\n")), 0644)
-}
-
-func stripAnsi(str string) string {
-	ansiRegex := regexp.MustCompile(`\x1B\[[0-9;]*[mK]`)
-	return ansiRegex.ReplaceAllString(str, "")
-}
-
-func countLines(path string) int {
-	file, err := os.Open(path)
-	if err != nil {
-		return 0
-	}
-	defer file.Close()
-
-	count := 0
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		count++
-	}
-	return count
-}
-
-func fileExists(path string) bool {
-	_, err := os.Stat(path)
-	return err == nil
 }

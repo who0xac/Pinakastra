@@ -1,0 +1,65 @@
+# Pinakastra Configuration
+# Copy this file to ~/.pinakastra/config.yaml and fill in your values
+
+# API Keys
+api_keys:
+  telegram_bot_token: ""
+  telegram_chat_id: ""
+  shodan: ""
+  censys_id: ""
+  censys_secret: ""
+  virustotal: ""
+  securitytrails: ""
+  chaos: ""
+  github: ""
+
+# Wordlists
+wordlists:
+  subdomains: "/path/to/subdomains.txt"
+  dns: "/path/to/dns-wordlist.txt"
+  directories: "/path/to/directory-wordlist.txt"
+
+# Storage
+storage:
+  base_path: "~/recon-results"
+
+# Web UI
+webui:
+  port: 8080
+  auto_open: true
+
+# Notifications
+notifications:
+  telegram: true
+  desktop: true
+  on_start: true
+  on_complete: true
+  on_critical: true
+  on_error: true
+  send_files: true
+
+# Tools Configuration (each tool has its own settings)
+tools:
+  subfinder:
+    enabled: true
+    threads: 50
+    timeout: 300
+  amass:
+    enabled: true
+    timeout: 600
+  httpx:
+    enabled: true
+    threads: 100
+    timeout: 120
+  nuclei:
+    enabled: true
+    threads: 50
+    timeout: 600
+  ffuf:
+    enabled: true
+    threads: 100
+    timeout: 300
+  naabu:
+    enabled: true
+    threads: 100
+    timeout: 300

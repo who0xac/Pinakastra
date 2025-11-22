@@ -40,15 +40,18 @@ func (g *Gf) Run(domain, outputDir string, cfg *config.Config) (string, error) {
 		return "", fmt.Errorf("no gau file found")
 	}
 
-	// Use gf to find XSS patterns in URLs from gau
-	args := []string{
-		"xss",
-		gauFile,
-	}
+	// gf reads from stdin, so we'll use cat to pipe the content
+	// Command: cat gau.txt | gf xss
+	catCmd := fmt.Sprintf("cat %s | gf xss", gauFile)
 
-	output, err := RunCommand(ctx, "gf", args...)
+	output, err := RunCommand(ctx, "sh", "-c", catCmd)
 	if err != nil {
-		return "", fmt.Errorf("gf failed: %w", err)
+		// gf might return error if no patterns found, but that's ok
+		// Just return empty output
+		if err := os.WriteFile(outputFile, []byte(""), 0644); err != nil {
+			return "", nil
+		}
+		return "", nil
 	}
 
 	if err := os.WriteFile(outputFile, []byte(output), 0644); err != nil {

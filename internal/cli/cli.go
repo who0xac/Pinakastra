@@ -65,6 +65,10 @@ func init() {
 
 	// Override help function
 	rootCmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
+		// Run first-time setup if needed
+		if err := config.Setup(); err != nil {
+			fmt.Printf("Setup failed: %v\n", err)
+		}
 		printBanner()
 		showHelp()
 	})

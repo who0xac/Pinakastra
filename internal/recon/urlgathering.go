@@ -69,11 +69,11 @@ func (u *URLGathering) Run() error {
 }
 
 func (u *URLGathering) runKatana() (string, error) {
-	liveURLs := filepath.Join(u.OutputDir, "live_hosts.txt")
+	liveURLs := filepath.Join(u.OutputDir, "live_urls.txt")
 	output := filepath.Join(u.OutputDir, "katana_urls.txt")
 
 	if _, err := os.Stat(liveURLs); os.IsNotExist(err) {
-		fmt.Println("\033[31m[✗] live_hosts.txt not found for Katana!\033[0m")
+		fmt.Println("\033[31m[✗] live_urls.txt not found for Katana!\033[0m")
 		return "", err
 	}
 
@@ -105,11 +105,11 @@ func (u *URLGathering) runKatana() (string, error) {
 }
 
 func (u *URLGathering) runGau() (string, error) {
-	subdomains := filepath.Join(u.OutputDir, "subdomains.txt")
+	subdomains := filepath.Join(u.OutputDir, "all_subdomains.txt")
 	output := filepath.Join(u.OutputDir, "gau_urls.txt")
 
 	if _, err := os.Stat(subdomains); os.IsNotExist(err) {
-		fmt.Println("\033[31m[✗] subdomains.txt not found for GAU!\033[0m")
+		fmt.Println("\033[31m[✗] all_subdomains.txt not found for GAU!\033[0m")
 		return "", err
 	}
 
@@ -196,7 +196,6 @@ func (u *URLGathering) probeAliveURLs() int {
 		"-o", outputFile,
 		"-threads", "150",
 		"-rate-limit", "50",
-		"-http-proxy", "socks5://127.0.0.1:9050",
 	)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

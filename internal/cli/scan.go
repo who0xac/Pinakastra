@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"time"
@@ -14,6 +15,9 @@ import (
 )
 
 func runScan(cmd *cobra.Command, args []string) {
+	// Setup signal handler for graceful cancellation
+	ctx := SetupSignalHandler()
+
 	log := logger.New()
 	cfg := config.Load()
 
@@ -27,10 +31,10 @@ func runScan(cmd *cobra.Command, args []string) {
 
 	notify := notifier.New(cfg)
 
-	scanDomain(domain, cfg, notify, log)
+	scanDomain(ctx, domain, cfg, notify, log)
 }
 
-func scanDomain(targetDomain string, cfg *config.Config, notify *notifier.Notifier, log *logger.Logger) {
+func scanDomain(ctx context.Context, targetDomain string, cfg *config.Config, notify *notifier.Notifier, log *logger.Logger) {
 	startTime := time.Now()
 
 	outDir := outputDir
@@ -48,33 +52,68 @@ func scanDomain(targetDomain string, cfg *config.Config, notify *notifier.Notifi
 	log.Info("Output directory: %s", color.YellowString(outDir))
 
 	// Step 1: Subdomain Enumeration
+	if ctx.Err() != nil {
+		log.Warning("Scan cancelled")
+		return
+	}
 	subdomainEnum := recon.NewSubdomainEnum(targetDomain, outDir, cfg)
 	subdomainEnum.Run()
 	subdomainEnum.MergeAndClean()
+	ResetInterruptCount()
 
 	// Step 2: Live Host Probing
+	if ctx.Err() != nil {
+		log.Warning("Scan cancelled")
+		return
+	}
 	liveHost := recon.NewLiveHostProbe(outDir)
 	liveHost.Run()
+	ResetInterruptCount()
 
 	// Step 3: DNS Resolution
+	if ctx.Err() != nil {
+		log.Warning("Scan cancelled")
+		return
+	}
 	resolver := recon.NewIPResolver(outDir)
 	resolver.Run()
+	ResetInterruptCount()
 
 	// Step 4: URL Gathering
+	if ctx.Err() != nil {
+		log.Warning("Scan cancelled")
+		return
+	}
 	urlGathering := recon.NewURLGathering(targetDomain, outDir)
 	urlGathering.Run()
+	ResetInterruptCount()
 
 	// Step 5: GF Pattern Matching
+	if ctx.Err() != nil {
+		log.Warning("Scan cancelled")
+		return
+	}
 	gfPatterns := recon.NewGFPatterns(targetDomain, outDir)
 	gfPatterns.Run()
+	ResetInterruptCount()
 
 	// Step 6: API Endpoint Discovery
+	if ctx.Err() != nil {
+		log.Warning("Scan cancelled")
+		return
+	}
 	apiEndpoints := recon.NewAPIEndpointFinder(targetDomain, outDir)
 	apiEndpoints.Run()
+	ResetInterruptCount()
 
 	// Step 7: Nuclei Vulnerability Scanning
+	if ctx.Err() != nil {
+		log.Warning("Scan cancelled")
+		return
+	}
 	nuclei := recon.NewNucleiScanner(targetDomain, outDir)
 	nuclei.Run()
+	ResetInterruptCount()
 
 	duration := time.Since(startTime)
 

@@ -14,6 +14,7 @@ import (
 var (
 	interruptCount int32
 	cancelFunc     context.CancelFunc
+	skipToNext     bool
 )
 
 // SetupSignalHandler sets up graceful cancellation on Ctrl+C
@@ -33,8 +34,9 @@ func SetupSignalHandler() context.Context {
 
 			fmt.Println()
 			if count == 1 {
-				yellow.Println("⚠ Interrupt received! Stopping current tool...")
+				yellow.Println("⚠ Interrupt received! Will skip to next tool after current completes...")
 				yellow.Println("  Press Ctrl+C again to force exit")
+				skipToNext = true
 				cancel()
 			} else if count == 2 {
 				yellow.Println("⚠ Second interrupt! Preparing to exit...")
@@ -53,4 +55,10 @@ func SetupSignalHandler() context.Context {
 // ResetInterruptCount resets the interrupt counter (call after each tool completes)
 func ResetInterruptCount() {
 	atomic.StoreInt32(&interruptCount, 0)
+	skipToNext = false
+}
+
+// ShouldSkipToNext returns true if user wants to skip to next tool
+func ShouldSkipToNext() bool {
+	return skipToNext
 }

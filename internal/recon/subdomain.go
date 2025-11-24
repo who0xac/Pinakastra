@@ -163,7 +163,8 @@ func (s *SubdomainEnum) runSublist3r() (string, error) {
 		"-e", "baidu,yahoo,google,bing,ask,netcraft,threatcrowd,ssl,passivedns",
 		"-o", output)
 	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	// Suppress Python SyntaxWarnings from stderr
+	cmd.Stderr = nil
 	err := cmd.Run()
 	return output, err
 }
@@ -196,6 +197,11 @@ func (s *SubdomainEnum) runShodan() (string, error) {
 	if s.Config.APIKeys.Shodan == "" {
 		return "", fmt.Errorf("no API key")
 	}
+
+	// Initialize Shodan API key
+	initCmd := exec.Command("shodan", "init", s.Config.APIKeys.Shodan)
+	initCmd.Run() // Ignore errors, init might already be done
+
 	output := filepath.Join(s.OutputDir, "shodan.txt")
 	cmd := exec.Command("shodan", "search", "--fields", "hostnames",
 		fmt.Sprintf("ssl:%s", s.Domain), "--limit", "0")

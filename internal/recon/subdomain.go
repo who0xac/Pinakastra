@@ -229,8 +229,8 @@ func (s *SubdomainEnum) runPuredns() (string, error) {
 		return "", fmt.Errorf("no resolvers at %s", resolvers)
 	}
 
-	// Command: puredns bruteforce <wordlist> <domain> -r <resolvers> -t 500 -w <output>
-	args := []string{"bruteforce", wordlist, s.Domain, "-r", resolvers, "-t", "500", "-w", output}
+	// Command: puredns bruteforce <wordlist> <domain> -r <resolvers> -w <output> --rate-limit 1000
+	args := []string{"bruteforce", wordlist, s.Domain, "-r", resolvers, "-w", output, "--rate-limit", "1000"}
 
 	cmd := exec.Command("puredns", args...)
 	cmd.Stdout = os.Stdout

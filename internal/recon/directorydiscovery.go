@@ -33,13 +33,17 @@ func (d *DirectoryDiscovery) Run() error {
 
 	startTime := time.Now()
 
-	// Run dirsearch
+	// Run dirsearch on all URLs first
 	dirsearchCount, err := d.runDirsearch()
 	if err != nil {
 		fmt.Printf("\033[31m[✗]\033[0m Dirsearch failed: %v\n", err)
 	}
 
-	// Run ffuf
+	fmt.Println()
+	fmt.Println("\033[36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m")
+	fmt.Println()
+
+	// Run ffuf after dirsearch completes
 	ffufCount, err := d.runFFUF()
 	if err != nil {
 		fmt.Printf("\033[31m[✗]\033[0m FFUF failed: %v\n", err)
@@ -97,9 +101,9 @@ func (d *DirectoryDiscovery) runDirsearch() (int, error) {
 		// Create output file for this URL
 		outputFile := filepath.Join(dirsearchDir, fmt.Sprintf("url_%d.txt", urlCount))
 
-		fmt.Printf("  [%d] %s\n", urlCount, url)
+		fmt.Printf("\n  [%d] %s\n\n", urlCount, url)
 
-		// Run dirsearch without wordlist (simple discovery)
+		// Run dirsearch without wordlist (simple discovery) - show full output
 		cmd := exec.Command("dirsearch",
 			"-u", url,
 			"-x", "500,502,429,404,400",
@@ -110,6 +114,8 @@ func (d *DirectoryDiscovery) runDirsearch() (int, error) {
 			"-o", outputFile,
 			"--delay", "0",
 		)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
 		cmd.Run() // Ignore errors, continue with other URLs
 
 		// Count results

@@ -68,15 +68,11 @@ func (d *DirectoryDiscovery) Run() error {
 
 func (d *DirectoryDiscovery) runDirsearch() (int, error) {
 	liveURLs := filepath.Join(d.OutputDir, "live_urls.txt")
-	dirsearchDir := filepath.Join(d.OutputDir, "dirsearch")
 
 	if _, err := os.Stat(liveURLs); os.IsNotExist(err) {
 		fmt.Println("\033[31m[✗] live_urls.txt not found for dirsearch!\033[0m")
 		return 0, err
 	}
-
-	// Create dirsearch output directory
-	os.MkdirAll(dirsearchDir, 0755)
 
 	fmt.Printf("\033[33m[+]\033[0m Running \033[1mdirsearch\033[0m on each URL...\n\n")
 
@@ -89,7 +85,6 @@ func (d *DirectoryDiscovery) runDirsearch() (int, error) {
 
 	scanner := bufio.NewScanner(file)
 	urlCount := 0
-	totalFound := 0
 
 	for scanner.Scan() {
 		url := strings.TrimSpace(scanner.Text())
@@ -98,33 +93,29 @@ func (d *DirectoryDiscovery) runDirsearch() (int, error) {
 		}
 		urlCount++
 
-		// Create output file for this URL
-		outputFile := filepath.Join(dirsearchDir, fmt.Sprintf("url_%d.txt", urlCount))
-
 		fmt.Printf("\n  [%d] %s\n\n", urlCount, url)
 
-		// Run dirsearch and pipe output through tee to save to file while showing on screen
-		bashCmd := fmt.Sprintf("dirsearch -u '%s' -x 500,502,429,404,400 -R 5 --random-agent -t 100 -F --delay 0 2>&1 | tee '%s'",
-			url, outputFile)
-
-		cmd := exec.Command("bash", "-c", bashCmd)
+		// Run dirsearch with default output - it saves automatically to /root/reports/
+		cmd := exec.Command("dirsearch",
+			"-u", url,
+			"-x", "500,502,429,404,400",
+			"-R", "5",
+			"--random-agent",
+			"-t", "100",
+			"-F",
+			"--delay", "0",
+		)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		cmd.Run() // Ignore errors, continue with other URLs
-
-		// Count results
-		if fileExists(outputFile) {
-			count := countLines(outputFile)
-			totalFound += count
-		}
 	}
 
 	fmt.Println()
-	fmt.Printf("\033[32m✓\033[0m \033[1mdirsearch\033[0m completed - %d URLs found\n", totalFound)
-	fmt.Printf("\033[34m[+]\033[0m Saved to: dirsearch/\n")
+	fmt.Printf("\033[32m✓\033[0m \033[1mdirsearch\033[0m completed - %d URLs scanned\n", urlCount)
+	fmt.Printf("\033[34m[+]\033[0m Results saved to dirsearch default output location\n")
 	fmt.Println()
 
-	return totalFound, nil
+	return urlCount, nil
 }
 
 func (d *DirectoryDiscovery) runFFUF() (int, error) {
@@ -213,19 +204,12 @@ func (d *DirectoryDiscovery) mergeDiscoveredURLs() int {
 	liveURLs := filepath.Join(d.OutputDir, "live_urls.txt")
 	readFileToMap(liveURLs, urlMap)
 
-	// Add dirsearch results
-	dirsearchDir := filepath.Join(d.OutputDir, "dirsearch")
-	if dirEntries, err := os.ReadDir(dirsearchDir); err == nil {
-		for _, entry := range dirEntries {
-			if !entry.IsDir() {
-				readFileToMap(filepath.Join(dirsearchDir, entry.Name()), urlMap)
-			}
-		}
-	}
-
 	// Add ffuf results
 	ffufResults := filepath.Join(d.OutputDir, "ffuf_results.txt")
 	readFileToMap(ffufResults, urlMap)
+
+	// Note: dirsearch saves to its default location (/root/reports/)
+	// so we only merge live_urls + ffuf results here
 
 	// Write merged file
 	outFile, _ := os.Create(mergedFile)

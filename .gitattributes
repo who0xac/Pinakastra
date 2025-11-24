@@ -1,1 +1,1 @@
-configs/wordlists/subdomains.txt filter=lfs diff=lfs merge=lfs -text
+# Remove all LFS tracking - files will be embedded in binary

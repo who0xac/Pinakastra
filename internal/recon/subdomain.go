@@ -217,17 +217,18 @@ func (s *SubdomainEnum) runShodan() (string, error) {
 
 func (s *SubdomainEnum) runPuredns() (string, error) {
 	output := filepath.Join(s.OutputDir, "puredns.txt")
-	wordlist := s.Config.Paths.Subdomains
-	resolvers := s.Config.Paths.Resolvers
+	wordlist := expandPath(s.Config.Paths.Subdomains)
+	resolvers := expandPath(s.Config.Paths.Resolvers)
 
 	if wordlist == "" || !fileExists(wordlist) {
-		return "", fmt.Errorf("no wordlist")
+		return "", fmt.Errorf("no wordlist at %s", wordlist)
 	}
 
-	args := []string{"bruteforce", wordlist, s.Domain, "-w", output, "-t", "500"}
-	if resolvers != "" && fileExists(resolvers) {
-		args = append(args, "-r", resolvers)
+	if resolvers == "" || !fileExists(resolvers) {
+		return "", fmt.Errorf("no resolvers at %s", resolvers)
 	}
+
+	args := []string{"bruteforce", wordlist, s.Domain, "-w", output, "-r", resolvers, "-t", "500"}
 
 	cmd := exec.Command("puredns", args...)
 	cmd.Stdout = os.Stdout

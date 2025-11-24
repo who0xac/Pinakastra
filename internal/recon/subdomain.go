@@ -198,22 +198,20 @@ func (s *SubdomainEnum) runShodan() (string, error) {
 		return "", fmt.Errorf("no API key")
 	}
 
-	// Initialize Shodan API key
+	// Initialize Shodan API key (suppress output)
 	initCmd := exec.Command("shodan", "init", s.Config.APIKeys.Shodan)
+	initCmd.Stdout = nil
+	initCmd.Stderr = nil
 	initCmd.Run() // Ignore errors, init might already be done
 
 	output := filepath.Join(s.OutputDir, "shodan.txt")
-	cmd := exec.Command("shodan", "search", "--fields", "hostnames",
-		fmt.Sprintf("ssl:%s", s.Domain), "--limit", "0")
-	cmd.Stderr = os.Stderr
-	out, err := cmd.Output()
-	if err == nil {
-		// Show in terminal
-		fmt.Print(string(out))
-		// Replace ; with newlines for file
-		result := strings.ReplaceAll(string(out), ";", "\n")
-		os.WriteFile(output, []byte(result), 0644)
-	}
+
+	// Use bash to pipe through tr for proper formatting
+	cmd := exec.Command("bash", "-c",
+		fmt.Sprintf("shodan search --fields hostnames 'ssl:%s' --limit 0 2>/dev/null | tr ';' '\\n' | tee %s",
+			s.Domain, output))
+	cmd.Stdout = os.Stdout
+	err := cmd.Run()
 	return output, err
 }
 

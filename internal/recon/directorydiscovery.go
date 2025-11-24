@@ -103,17 +103,11 @@ func (d *DirectoryDiscovery) runDirsearch() (int, error) {
 
 		fmt.Printf("\n  [%d] %s\n\n", urlCount, url)
 
-		// Run dirsearch without wordlist (simple discovery) - show full output
-		cmd := exec.Command("dirsearch",
-			"-u", url,
-			"-x", "500,502,429,404,400",
-			"-R", "5",
-			"--random-agent",
-			"-t", "100",
-			"-F",
-			"-o", outputFile,
-			"--delay", "0",
-		)
+		// Run dirsearch and pipe output through tee to save to file while showing on screen
+		bashCmd := fmt.Sprintf("dirsearch -u '%s' -x 500,502,429,404,400 -R 5 --random-agent -t 100 -F --delay 0 2>&1 | tee '%s'",
+			url, outputFile)
+
+		cmd := exec.Command("bash", "-c", bashCmd)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		cmd.Run() // Ignore errors, continue with other URLs

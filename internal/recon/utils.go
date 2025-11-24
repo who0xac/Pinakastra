@@ -3,7 +3,10 @@ package recon
 import (
 	"bufio"
 	"os"
+	"path/filepath"
 	"regexp"
+	"runtime"
+	"strings"
 )
 
 // countLines counts the number of lines in a file
@@ -32,4 +35,19 @@ func fileExists(path string) bool {
 func stripAnsi(str string) string {
 	ansiRegex := regexp.MustCompile(`\x1B\[[0-9;]*[mK]`)
 	return ansiRegex.ReplaceAllString(str, "")
+}
+
+// expandPath expands ~ to home directory
+func expandPath(path string) string {
+	if strings.HasPrefix(path, "~/") {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return path
+		}
+		if runtime.GOOS == "windows" {
+			return filepath.Join(home, strings.ReplaceAll(path[2:], "/", "\\"))
+		}
+		return filepath.Join(home, path[2:])
+	}
+	return path
 }

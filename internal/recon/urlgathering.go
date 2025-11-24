@@ -196,6 +196,7 @@ func (u *URLGathering) probeAliveURLs() int {
 		"-o", outputFile,
 		"-threads", "150",
 		"-rate-limit", "50",
+		"-http-proxy", "socks5://127.0.0.1:9050",
 	)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

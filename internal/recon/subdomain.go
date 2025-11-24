@@ -222,15 +222,24 @@ func (s *SubdomainEnum) runPuredns() (string, error) {
 	resolvers := expandPath(s.Config.Paths.Resolvers)
 
 	if wordlist == "" || !fileExists(wordlist) {
+		fmt.Println("\033[33m[!]\033[0m Skipping puredns - wordlist not found")
 		return "", fmt.Errorf("no wordlist at %s", wordlist)
 	}
 
 	if resolvers == "" || !fileExists(resolvers) {
+		fmt.Println("\033[33m[!]\033[0m Skipping puredns - resolvers not found")
 		return "", fmt.Errorf("no resolvers at %s", resolvers)
 	}
 
+	// Check wordlist size - skip if too small
+	wordlistSize := countLines(wordlist)
+	if wordlistSize < 100 {
+		fmt.Printf("\033[33m[!]\033[0m Skipping puredns - wordlist too small (%d lines)\n", wordlistSize)
+		return "", fmt.Errorf("wordlist too small: %d lines", wordlistSize)
+	}
+
 	// Command: puredns bruteforce <wordlist> <domain> -r <resolvers> -w <output> --rate-limit 1000
-	args := []string{"bruteforce", wordlist, s.Domain, "-r", resolvers, "-w", output, "--rate-limit", "1000"}
+	args := []string{"bruteforce", wordlist, s.Domain, "-r", resolvers, "-w", output, "--rate-limit", "1000", "--skip-validation"}
 
 	cmd := exec.Command("puredns", args...)
 	cmd.Stdout = os.Stdout

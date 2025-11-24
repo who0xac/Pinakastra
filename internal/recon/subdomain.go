@@ -163,7 +163,8 @@ func (s *SubdomainEnum) runSublist3r() (string, error) {
 		"-e", "baidu,yahoo,google,bing,ask,netcraft,threatcrowd,ssl,passivedns",
 		"-o", output)
 	cmd.Stdout = os.Stdout
-	// Suppress Python SyntaxWarnings from stderr
+	// Suppress Python SyntaxWarnings using PYTHONWARNINGS environment variable
+	cmd.Env = append(os.Environ(), "PYTHONWARNINGS=ignore")
 	cmd.Stderr = nil
 	err := cmd.Run()
 	return output, err

@@ -52,7 +52,7 @@ func scanDomain(ctx context.Context, targetDomain string, cfg *config.Config, no
 	log.Info("Output directory: %s", color.YellowString(outDir))
 
 	// Step 1: Subdomain Enumeration
-	log.Info("Step 1/7: Subdomain Enumeration")
+	log.Info("Step 1/8: Subdomain Enumeration")
 	subdomainEnum := recon.NewSubdomainEnum(targetDomain, outDir, cfg)
 	subdomainEnum.Run()
 	subdomainEnum.MergeAndClean()
@@ -62,7 +62,7 @@ func scanDomain(ctx context.Context, targetDomain string, cfg *config.Config, no
 	}
 
 	// Step 2: Live Host Probing
-	log.Info("Step 2/7: Live Host Probing")
+	log.Info("Step 2/8: Live Host Probing")
 	liveHost := recon.NewLiveHostProbe(outDir)
 	liveHost.Run()
 	if ctx.Err() != nil {
@@ -71,7 +71,7 @@ func scanDomain(ctx context.Context, targetDomain string, cfg *config.Config, no
 	}
 
 	// Step 3: DNS Resolution
-	log.Info("Step 3/7: DNS Resolution")
+	log.Info("Step 3/8: DNS Resolution")
 	resolver := recon.NewIPResolver(outDir)
 	resolver.Run()
 	if ctx.Err() != nil {
@@ -79,8 +79,17 @@ func scanDomain(ctx context.Context, targetDomain string, cfg *config.Config, no
 		ResetInterruptCount()
 	}
 
-	// Step 4: URL Gathering
-	log.Info("Step 4/7: URL Gathering")
+	// Step 4: Directory Discovery
+	log.Info("Step 4/8: Directory Discovery")
+	dirDiscovery := recon.NewDirectoryDiscovery(outDir, cfg)
+	dirDiscovery.Run()
+	if ctx.Err() != nil {
+		log.Warning("Interrupted - moving to next step")
+		ResetInterruptCount()
+	}
+
+	// Step 5: URL Gathering
+	log.Info("Step 5/8: URL Gathering")
 	urlGathering := recon.NewURLGathering(targetDomain, outDir)
 	urlGathering.Run()
 	if ctx.Err() != nil {
@@ -88,8 +97,8 @@ func scanDomain(ctx context.Context, targetDomain string, cfg *config.Config, no
 		ResetInterruptCount()
 	}
 
-	// Step 5: GF Pattern Matching
-	log.Info("Step 5/7: GF Pattern Matching")
+	// Step 6: GF Pattern Matching
+	log.Info("Step 6/8: GF Pattern Matching")
 	gfPatterns := recon.NewGFPatterns(targetDomain, outDir)
 	gfPatterns.Run()
 	if ctx.Err() != nil {
@@ -97,8 +106,8 @@ func scanDomain(ctx context.Context, targetDomain string, cfg *config.Config, no
 		ResetInterruptCount()
 	}
 
-	// Step 6: API Endpoint Discovery
-	log.Info("Step 6/7: API Endpoint Discovery")
+	// Step 7: API Endpoint Discovery
+	log.Info("Step 7/8: API Endpoint Discovery")
 	apiEndpoints := recon.NewAPIEndpointFinder(targetDomain, outDir)
 	apiEndpoints.Run()
 	if ctx.Err() != nil {
@@ -106,8 +115,8 @@ func scanDomain(ctx context.Context, targetDomain string, cfg *config.Config, no
 		ResetInterruptCount()
 	}
 
-	// Step 7: Nuclei Vulnerability Scanning
-	log.Info("Step 7/7: Nuclei Vulnerability Scanning")
+	// Step 8: Nuclei Vulnerability Scanning
+	log.Info("Step 8/8: Nuclei Vulnerability Scanning")
 	nuclei := recon.NewNucleiScanner(targetDomain, outDir)
 	nuclei.Run()
 	if ctx.Err() != nil {

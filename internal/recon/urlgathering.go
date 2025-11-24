@@ -69,18 +69,18 @@ func (u *URLGathering) Run() error {
 }
 
 func (u *URLGathering) runKatana() (string, error) {
-	liveURLs := filepath.Join(u.OutputDir, "live_urls.txt")
+	discoveredURLs := filepath.Join(u.OutputDir, "all_discovered_urls.txt")
 	output := filepath.Join(u.OutputDir, "katana_urls.txt")
 
-	if _, err := os.Stat(liveURLs); os.IsNotExist(err) {
-		fmt.Println("\033[31m[✗] live_urls.txt not found for Katana!\033[0m")
+	if _, err := os.Stat(discoveredURLs); os.IsNotExist(err) {
+		fmt.Println("\033[31m[✗] all_discovered_urls.txt not found for Katana!\033[0m")
 		return "", err
 	}
 
 	fmt.Printf("\033[33m[+]\033[0m Running \033[1mkatana\033[0m...\n\n")
 
 	cmd := exec.Command("katana",
-		"-list", liveURLs,
+		"-list", discoveredURLs,
 		"-d", "5",
 		"-kf",
 		"-jc",

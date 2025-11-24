@@ -105,19 +105,19 @@ func (u *URLGathering) runKatana() (string, error) {
 }
 
 func (u *URLGathering) runGau() (string, error) {
-	subdomains := filepath.Join(u.OutputDir, "all_subdomains.txt")
+	liveURLs := filepath.Join(u.OutputDir, "live_urls.txt")
 	output := filepath.Join(u.OutputDir, "gau_urls.txt")
 
-	if _, err := os.Stat(subdomains); os.IsNotExist(err) {
-		fmt.Println("\033[31m[✗] all_subdomains.txt not found for GAU!\033[0m")
+	if _, err := os.Stat(liveURLs); os.IsNotExist(err) {
+		fmt.Println("\033[31m[✗] live_urls.txt not found for GAU!\033[0m")
 		return "", err
 	}
 
 	fmt.Println("\033[36m►\033[0m \033[1mgau\033[0m started...")
 	fmt.Println()
 
-	// Read subdomains and pipe to gau
-	inFile, err := os.Open(subdomains)
+	// Read live URLs and pipe to gau
+	inFile, err := os.Open(liveURLs)
 	if err != nil {
 		return "", err
 	}

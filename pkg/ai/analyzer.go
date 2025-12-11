@@ -6,15 +6,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yourusername/pinakastra/pkg/api"
-	"github.com/yourusername/pinakastra/pkg/cloud"
-	"github.com/yourusername/pinakastra/pkg/cors"
-	"github.com/yourusername/pinakastra/pkg/fingerprint"
-	"github.com/yourusername/pinakastra/pkg/nuclei"
-	"github.com/yourusername/pinakastra/pkg/secrets"
-	"github.com/yourusername/pinakastra/pkg/security"
-	"github.com/yourusername/pinakastra/pkg/takeover"
-	"github.com/yourusername/pinakastra/pkg/tls"
+	"github.com/who0xac/pinakastra/pkg/api"
+	"github.com/who0xac/pinakastra/pkg/cloud"
+	"github.com/who0xac/pinakastra/pkg/cors"
+	"github.com/who0xac/pinakastra/pkg/fingerprint"
+	"github.com/who0xac/pinakastra/pkg/nuclei"
+	"github.com/who0xac/pinakastra/pkg/secrets"
+	"github.com/who0xac/pinakastra/pkg/security"
+	"github.com/who0xac/pinakastra/pkg/takeover"
+	"github.com/who0xac/pinakastra/pkg/tls"
 )
 
 // Analyzer is AI System 1 - Strategic analyzer that correlates findings

@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/yourusername/pinakastra/pkg/output/terminal"
+	"github.com/who0xac/pinakastra/pkg/output/terminal"
 )
 
 // PassiveEnumerator coordinates all passive subdomain enumeration tools

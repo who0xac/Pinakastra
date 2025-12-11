@@ -43,7 +43,24 @@ Pinakastra is a comprehensive reconnaissance tool that automates subdomain enume
 
 ## 🚀 Quick Start
 
-### Installation
+### Direct Installation (Recommended)
+
+**One-line install:**
+```bash
+go install github.com/who0xac/pinakastra/cmd/pinakastra@latest
+```
+
+This will:
+- Download and compile Pinakastra
+- Install to `$GOPATH/bin/pinakastra`
+- Make it available globally
+
+**Or use install script:**
+```bash
+curl -sSL https://raw.githubusercontent.com/who0xac/Pinakastra/main/install.sh | bash
+```
+
+### Manual Installation
 
 ```bash
 # Clone repository

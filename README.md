@@ -147,6 +147,66 @@ scan:
 
 ---
 
+## 🤖 AI Configuration (Optional)
+
+Pinakastra supports AI-powered exploitation and analysis using Ollama.
+
+### Install Ollama
+
+**Linux:**
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
+**Start Ollama service:**
+```bash
+ollama serve
+```
+
+### Pull AI Models
+
+```bash
+# For exploit generation (recommended)
+ollama pull qwen2.5-coder:7b
+
+# For deep analysis (optional)
+ollama pull deepseek-coder:6.7b
+
+# For general analysis (lightweight)
+ollama pull llama3.1:8b
+```
+
+### AI Features
+
+When running with `--ai-deep` flag:
+
+- ✨ **Automatic Exploit Generation**: Creates working exploits for discovered vulnerabilities
+- 🧠 **False Positive Filtering**: AI validates findings to reduce noise
+- 📊 **Technical Reports**: Auto-generates detailed security reports
+- 🔍 **Vulnerability Analysis**: Deep analysis of security issues
+- 💡 **Remediation Advice**: AI-powered fix recommendations
+
+### Usage
+
+```bash
+# Enable AI-powered deep analysis
+pinakastra -d target.com --ai-deep
+
+# AI with custom web UI port
+pinakastra -d target.com --ai-deep --web-port 9000
+```
+
+### Supported AI Models
+
+Pinakastra automatically detects and uses available Ollama models:
+- `qwen2.5-coder` (recommended for exploitation)
+- `deepseek-coder` (good for code analysis)
+- `llama3.1` (general purpose)
+
+**Note:** Make sure Ollama is running (`ollama serve`) before using `--ai-deep`
+
+---
+
 ## 🛠️ Tool Checks
 
 Verify installed tools:

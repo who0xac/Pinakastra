@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔱 Pinakastra - Security Assessment Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body x-data="dashboard()" x-init="init()">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1 class="logo">🔱 PINAKASTRA</h1>
+                <div class="target-info">
+                    <span class="target-label">Target:</span>
+                    <span class="target-domain" x-text="domain"></span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="theme-toggle" @click="toggleTheme()">
+                    <span x-show="theme === 'dark'">☀️</span>
+                    <span x-show="theme === 'light'">🌙</span>
+                </button>
+                <button class="export-btn" @click="showExportMenu = !showExportMenu">
+                    Export ▼
+                </button>
+                <div class="export-menu" x-show="showExportMenu" @click.away="showExportMenu = false">
+                    <a href="#" @click.prevent="exportData('json')">Export as JSON</a>
+                    <a href="#" @click.prevent="exportData('csv')">Export as CSV</a>
+                    <a href="#" @click.prevent="exportData('html')">Export as HTML</a>
+                    <a href="#" @click.prevent="exportData('pdf')">Export as PDF</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-section">
+            <div class="progress-info">
+                <span class="progress-phase" x-text="'Phase ' + status.phaseNumber + '/7 - ' + status.phase"></span>
+                <span class="progress-time" x-text="'⏱ ' + status.elapsedTime"></span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" :style="'width: ' + status.progress + '%'"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" x-text="stats.totalSubdomains"></div>
+                <div class="stat-label">Subdomains</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" x-text="stats.liveHosts"></div>
+                <div class="stat-label">Live Hosts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" x-text="stats.totalURLs"></div>
+                <div class="stat-label">URLs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" x-text="stats.totalVulnerabilities"></div>
+                <div class="stat-label">Vulnerabilities</div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="charts-row">
+            <!-- Vulnerability Breakdown Chart -->
+            <div class="chart-card">
+                <h3 class="chart-title">Vulnerability Breakdown</h3>
+                <canvas id="vulnChart"></canvas>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <span class="legend-color critical"></span>
+                        <span>Critical: <strong x-text="stats.vulnsBySeverity.critical"></strong></span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color high"></span>
+                        <span>High: <strong x-text="stats.vulnsBySeverity.high"></strong></span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color medium"></span>
+                        <span>Medium: <strong x-text="stats.vulnsBySeverity.medium"></strong></span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color low"></span>
+                        <span>Low: <strong x-text="stats.vulnsBySeverity.low"></strong></span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color info"></span>
+                        <span>Info: <strong x-text="stats.vulnsBySeverity.info"></strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HTTP Status Codes -->
+            <div class="chart-card">
+                <h3 class="chart-title">HTTP Status Codes</h3>
+                <div class="status-codes">
+                    <template x-for="(count, code) in stats.httpStatusCodes" :key="code">
+                        <div class="status-item" @click="filterByStatus(code)">
+                            <span class="status-code" x-text="code"></span>
+                            <span class="status-count" x-text="count"></span>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab" :class="{ active: activeTab === 'subdomains' }" @click="activeTab = 'subdomains'">
+                🌐 Subdomains
+            </button>
+            <button class="tab" :class="{ active: activeTab === 'vulnerabilities' }" @click="activeTab = 'vulnerabilities'">
+                🔓 Vulnerabilities
+            </button>
+            <button class="tab" :class="{ active: activeTab === 'livefeed' }" @click="activeTab = 'livefeed'">
+                🎯 Live Feed
+            </button>
+            <button class="tab" :class="{ active: activeTab === 'ports' }" @click="activeTab = 'ports'">
+                🔌 Ports
+            </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+
+            <!-- Subdomains Tab -->
+            <div x-show="activeTab === 'subdomains'" class="tab-panel">
+                <div class="panel-header">
+                    <h2>Discovered Subdomains</h2>
+                    <button class="btn-primary" @click="copyAllSubdomains()">📋 Copy All</button>
+                </div>
+                <div class="subdomain-list">
+                    <template x-for="sub in subdomains" :key="sub.subdomain">
+                        <div class="subdomain-item">
+                            <span class="subdomain-name" x-text="sub.subdomain"></span>
+                            <span class="subdomain-ip" x-text="sub.ipAddress"></span>
+                            <div class="subdomain-actions">
+                                <button class="btn-small" @click="copyToClipboard(sub.subdomain)">Copy</button>
+                                <button class="btn-small" @click="openURL(sub.subdomain)">Open</button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Vulnerabilities Tab -->
+            <div x-show="activeTab === 'vulnerabilities'" class="tab-panel">
+                <div class="panel-header">
+                    <h2>Vulnerabilities</h2>
+                    <div class="filters">
+                        <select x-model="filters.severity" @change="applyFilters()">
+                            <option value="">All Severities</option>
+                            <option value="critical">Critical</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                            <option value="info">Info</option>
+                        </select>
+                        <select x-model="filters.type" @change="applyFilters()">
+                            <option value="">All Types</option>
+                            <option value="sqli">SQL Injection</option>
+                            <option value="xss">XSS</option>
+                            <option value="cors">CORS</option>
+                            <option value="api">API</option>
+                            <option value="cloud">Cloud</option>
+                        </select>
+                        <input type="text" x-model="filters.search" @input="applyFilters()" placeholder="Search...">
+                    </div>
+                </div>
+
+                <div class="vuln-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Severity</th>
+                                <th>Type</th>
+                                <th>URL</th>
+                                <th>Endpoint</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="vuln in filteredVulnerabilities" :key="vuln.id">
+                                <tr @click="expandVuln(vuln)">
+                                    <td><span class="severity-badge" :class="vuln.severity" x-text="vuln.severity"></span></td>
+                                    <td x-text="vuln.type"></td>
+                                    <td class="url-cell" x-text="truncateURL(vuln.url)"></td>
+                                    <td x-text="vuln.endpoint"></td>
+                                    <td><button class="btn-small">View</button></td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Live Feed Tab -->
+            <div x-show="activeTab === 'livefeed'" class="tab-panel">
+                <div class="panel-header">
+                    <h2>Live Activity Feed</h2>
+                    <label class="toggle">
+                        <input type="checkbox" x-model="autoScroll" checked>
+                        Auto-scroll
+                    </label>
+                </div>
+                <div class="live-feed" id="liveFeed">
+                    <template x-for="(event, index) in liveFeed" :key="index">
+                        <div class="feed-item" :class="event.type">
+                            <span class="feed-time" x-text="formatTime(event.timestamp)"></span>
+                            <span class="feed-message" x-text="event.message"></span>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Ports Tab -->
+            <div x-show="activeTab === 'ports'" class="tab-panel">
+                <div class="panel-header">
+                    <h2>Open Ports</h2>
+                </div>
+                <div class="ports-grid">
+                    <template x-for="port in openPorts" :key="port.host + ':' + port.port">
+                        <div class="port-card">
+                            <div class="port-host" x-text="port.host"></div>
+                            <div class="port-number" x-text="'Port: ' + port.port"></div>
+                            <div class="port-service" x-text="port.service"></div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

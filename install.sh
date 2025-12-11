@@ -1,105 +1,78 @@
 #!/bin/bash
 
-# Pinakastra Installation Script for Linux/macOS
-# Usage: sudo ./install.sh
+# Pinakastra Installation Script (Linux Only)
+# Installs Pinakastra globally so you can run it from anywhere
 
 set -e
 
-echo "→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→"
-echo "                    Pinakastra Global Installation"
-echo "→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→"
-echo
+echo "🔱 Pinakastra Installation Script"
+echo "=================================="
+echo "Platform: Linux"
+echo ""
 
 # Colors
+RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
-RED='\033[0;31m'
+BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Check if Go is installed
 if ! command -v go &> /dev/null; then
-    echo -e "${RED}[✗]${NC} Go is not installed. Please install Go 1.21 or higher."
+    echo -e "${RED}❌ Go is not installed!${NC}"
+    echo "Please install Go from: https://go.dev/dl/"
     exit 1
 fi
 
-echo -e "${GREEN}[✓]${NC} Go detected: $(go version)"
-echo
+echo -e "${GREEN}✅ Go is installed${NC}"
+go version
+echo ""
 
-# Build the binary
-echo -e "${YELLOW}[+]${NC} Building Pinakastra..."
-go build -o pinakastra -ldflags="-s -w" .
-
-if [ $? -ne 0 ]; then
-    echo -e "${RED}[✗]${NC} Build failed!"
-    exit 1
+# Check if $GOPATH/bin is in PATH
+GOBIN=$(go env GOBIN)
+if [ -z "$GOBIN" ]; then
+    GOBIN="$(go env GOPATH)/bin"
 fi
 
-echo -e "${GREEN}[✓]${NC} Build successful"
-echo
-
-# Install to /usr/local/bin
-echo -e "${YELLOW}[+]${NC} Installing to /usr/local/bin/pinakastra..."
-
-# Check if running as root
-if [ "$EUID" -ne 0 ]; then
-    echo -e "${YELLOW}[!]${NC} Installing requires sudo privileges..."
-    sudo mv pinakastra /usr/local/bin/pinakastra
-    sudo chmod +x /usr/local/bin/pinakastra
-else
-    mv pinakastra /usr/local/bin/pinakastra
-    chmod +x /usr/local/bin/pinakastra
+if [[ ":$PATH:" != *":$GOBIN:"* ]]; then
+    echo -e "${YELLOW}⚠️  Warning: $GOBIN is not in your PATH${NC}"
+    echo "Add this to your ~/.bashrc or ~/.zshrc:"
+    echo ""
+    echo "  export PATH=\"\$PATH:$GOBIN\""
+    echo ""
 fi
 
-if [ $? -ne 0 ]; then
-    echo -e "${RED}[✗]${NC} Installation failed!"
-    exit 1
-fi
+# Build and install
+echo "🔨 Building Pinakastra..."
+go build -o pinakastra ./cmd/pinakastra
 
-echo -e "${GREEN}[✓]${NC} Pinakastra installed to /usr/local/bin"
-echo
+echo "📦 Installing to $GOBIN..."
+go install ./cmd/pinakastra
+
+echo ""
+echo -e "${GREEN}✅ Installation complete!${NC}"
+echo ""
 
 # Create config directory
-CONFIG_DIR="$HOME/.config/pinakastra"
-if [ ! -d "$CONFIG_DIR" ]; then
-    echo -e "${YELLOW}[+]${NC} Creating config directory at $CONFIG_DIR..."
-    mkdir -p "$CONFIG_DIR"
+echo "📁 Setting up config directory..."
+pinakastra version > /dev/null 2>&1 || true
+echo -e "${GREEN}✅ Config directory created${NC}"
+echo ""
 
-    # Copy default config if exists
-    if [ -f "configs/default.yaml" ]; then
-        cp configs/default.yaml "$CONFIG_DIR/config.yaml"
-        echo -e "${GREEN}[✓]${NC} Default config copied to $CONFIG_DIR/config.yaml"
-    fi
-fi
+# Check tools
+echo "🔍 Checking required tools..."
+pinakastra check
 
-# Create results directory
-RESULTS_DIR="$HOME/recon-results"
-if [ ! -d "$RESULTS_DIR" ]; then
-    echo -e "${YELLOW}[+]${NC} Creating results directory at $RESULTS_DIR..."
-    mkdir -p "$RESULTS_DIR"
-    echo -e "${GREEN}[✓]${NC} Results directory created"
-fi
-
-echo
-echo "→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→"
-echo -e "${GREEN}[✓]${NC} Installation Complete!"
-echo
-echo -e "${CYAN}Installation Summary:${NC}"
-echo -e "  ${CYAN}•${NC} Binary     : /usr/local/bin/pinakastra"
-echo -e "  ${CYAN}•${NC} Config     : $CONFIG_DIR/config.yaml"
-echo -e "  ${CYAN}•${NC} Results    : $RESULTS_DIR"
-echo
-echo -e "${CYAN}Usage:${NC}"
-echo -e "  ${YELLOW}pinakastra -d example.com${NC}     - Start a scan"
-echo -e "  ${YELLOW}pinakastra -c${NC}                 - Check installed tools"
-echo -e "  ${YELLOW}pinakastra -h${NC}                 - Show help"
-echo "→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→"
-echo
-
-# Verify installation
-if command -v pinakastra &> /dev/null; then
-    echo -e "${GREEN}[✓]${NC} Verification: pinakastra command is available globally"
-    echo
-else
-    echo -e "${RED}[✗]${NC} Verification failed. Please add /usr/local/bin to your PATH"
-fi
+echo ""
+echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${GREEN}🎉 Pinakastra is now installed!${NC}"
+echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo ""
+echo "Usage:"
+echo "  pinakastra -d target.com"
+echo "  pinakastra check"
+echo "  pinakastra --help"
+echo ""
+echo "Config directory:"
+echo "  ~/.config/pinakastra/"
+echo ""

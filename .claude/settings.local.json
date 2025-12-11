@@ -8,7 +8,12 @@
       "Bash(chmod:*)",
       "Bash(ls:*)",
       "Bash(rm:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(gh --version:*)",
+      "Bash(find:*)",
+      "Bash(git reset:*)"
     ],
     "deny": [],
     "ask": []

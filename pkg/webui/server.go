@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"log"
 	"net/http"
 	"sync"
@@ -89,8 +90,12 @@ func NewServer(port int, domain string) *Server {
 func (s *Server) Start() error {
 	mux := http.NewServeMux()
 
-	// Serve static files from filesystem
-	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
+	// Serve static files from embedded FS
+	staticFS, err := fs.Sub(WebFiles, "web/static")
+	if err != nil {
+		return fmt.Errorf("failed to load embedded static files: %v", err)
+	}
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(staticFS))))
 
 	// Serve main dashboard
 	mux.HandleFunc("/", s.handleIndex)
@@ -136,7 +141,13 @@ func (s *Server) SendUpdate(updateType string, data interface{}) {
 
 // handleIndex serves the main dashboard page
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "web/templates/index.html")
+	data, err := WebFiles.ReadFile("web/templates/index.html")
+	if err != nil {
+		http.Error(w, "Failed to load dashboard", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "text/html")
+	w.Write(data)
 }
 
 // handleWebSocket handles WebSocket connections

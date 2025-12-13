@@ -110,7 +110,7 @@ var scanCmd = &cobra.Command{
 		}
 
 		// Create scanner and run
-		s := scanner.NewScanner(config)
+		s := scanner.NewScanner(config, WebFiles)
 		if err := s.Run(); err != nil {
 			fmt.Printf("Error: %v\n", err)
 			os.Exit(1)

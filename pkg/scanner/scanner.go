@@ -3,6 +3,7 @@ package scanner
 import (
 	"context"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -58,15 +59,17 @@ type Scanner struct {
 	scanResult      *formatter.ScanResult
 	startTime       time.Time
 	webUIServer     *webui.Server
+	webFiles        fs.FS
 }
 
 // NewScanner creates a new scanner instance
-func NewScanner(config *ScanConfig) *Scanner {
+func NewScanner(config *ScanConfig, webFiles fs.FS) *Scanner {
 	return &Scanner{
 		Config:      config,
 		ctx:         context.Background(),
 		termCapture: utils.NewTerminalCapture(),
 		startTime:   time.Now(),
+		webFiles:    webFiles,
 	}
 }
 
@@ -87,7 +90,7 @@ func (s *Scanner) Run() error {
 
 	// Start Web UI if enabled
 	if s.Config.WebUI {
-		s.webUIServer = webui.NewServer(s.Config.WebPort, s.Config.Domain)
+		s.webUIServer = webui.NewServer(s.Config.WebPort, s.Config.Domain, s.webFiles)
 		go func() {
 			if err := s.webUIServer.Start(); err != nil {
 				s.log(fmt.Sprintf("Web UI error: %v", err))

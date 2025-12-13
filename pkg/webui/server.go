@@ -27,6 +27,7 @@ type Server struct {
 	clients    map[*websocket.Conn]bool
 	clientsMux sync.RWMutex
 	broadcast  chan ScanUpdate
+	webFS      fs.FS
 }
 
 // ScanUpdate represents real-time scan updates
@@ -77,12 +78,13 @@ type StatsUpdate struct {
 }
 
 // NewServer creates a new web UI server
-func NewServer(port int, domain string) *Server {
+func NewServer(port int, domain string, webFS fs.FS) *Server {
 	return &Server{
 		port:      port,
 		domain:    domain,
 		clients:   make(map[*websocket.Conn]bool),
 		broadcast: make(chan ScanUpdate, 100),
+		webFS:     webFS,
 	}
 }
 
@@ -91,7 +93,7 @@ func (s *Server) Start() error {
 	mux := http.NewServeMux()
 
 	// Serve static files from embedded FS
-	staticFS, err := fs.Sub(WebFiles, "web/static")
+	staticFS, err := fs.Sub(s.webFS, "web/static")
 	if err != nil {
 		return fmt.Errorf("failed to load embedded static files: %v", err)
 	}
@@ -141,7 +143,7 @@ func (s *Server) SendUpdate(updateType string, data interface{}) {
 
 // handleIndex serves the main dashboard page
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
-	data, err := WebFiles.ReadFile("web/templates/index.html")
+	data, err := fs.ReadFile(s.webFS, "web/templates/index.html")
 	if err != nil {
 		http.Error(w, "Failed to load dashboard", http.StatusInternalServerError)
 		return

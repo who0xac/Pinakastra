@@ -39,7 +39,7 @@ func printBanner() {
 	cyan := color.New(color.FgCyan, color.Bold)      // Deep cyan for ASCII art
 	magenta := color.New(color.FgMagenta, color.Bold) // Deep magenta for title
 	blue := color.New(color.FgBlue, color.Bold)       // Deep blue for subtitle
-	red := color.New(color.FgRed, color.Bold)         // Bold red for author
+	brightRed := color.New(color.FgHiRed, color.Bold) // Bright red for author (more visible)
 	green := color.New(color.FgGreen)                 // Dark green for version
 
 	cyan.Println(`
@@ -55,7 +55,7 @@ ____  _             _            _
 	fmt.Println()
 	green.Printf("Version: %s\n", version)
 	fmt.Print("Author: ")
-	red.Printf("%s\n\n", author)
+	brightRed.Printf("%s\n\n", author)
 }
 
 var (

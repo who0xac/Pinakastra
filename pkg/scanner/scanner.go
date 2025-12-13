@@ -125,19 +125,19 @@ func (s *Scanner) Run() error {
 	}
 
 	// Phase 2: HTTP Probing
-	liveURLs, err := s.runHTTPProbing(outputPath, subdomains)
+	_, err = s.runHTTPProbing(outputPath, subdomains)
 	if err != nil {
 		return fmt.Errorf("HTTP probing failed: %v", err)
 	}
 
 	// Phase 3: IP Resolution
-	resolvedIPs, err := s.runIPResolution(outputPath)
+	_, err = s.runIPResolution(outputPath)
 	if err != nil {
 		return fmt.Errorf("IP resolution failed: %v", err)
 	}
 
 	// Phase 4: URL Discovery
-	allURLs, err := s.runURLDiscovery(outputPath)
+	_, err = s.runURLDiscovery(outputPath)
 	if err != nil {
 		return fmt.Errorf("URL discovery failed: %v", err)
 	}
@@ -428,14 +428,14 @@ func (s *Scanner) runURLDiscovery(outputPath string) ([]string, error) {
 
 	// Run Katana
 	katanaRunner := urldiscovery.NewKatanaRunner(liveURLsFile, outputPath)
-	katanaResult, err := katanaRunner.Run(s.ctx)
+	_, err := katanaRunner.Run(s.ctx)
 	if err != nil {
 		s.log(fmt.Sprintf("Katana failed: %v", err))
 	}
 
 	// Run GAU
 	gauRunner := urldiscovery.NewGAURunner(liveURLsFile, outputPath)
-	gauResult, err := gauRunner.Run(s.ctx)
+	_, err = gauRunner.Run(s.ctx)
 	if err != nil {
 		s.log(fmt.Sprintf("GAU failed: %v", err))
 	}

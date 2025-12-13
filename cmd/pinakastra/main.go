@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -201,6 +202,41 @@ var checkCmd = &cobra.Command{
 	},
 }
 
+var updateCmd = &cobra.Command{
+	Use:     "update",
+	Aliases: []string{"u"},
+	Short:   "Update Pinakastra to the latest version",
+	Long:    "Update Pinakastra binary to the latest version from GitHub",
+	Run: func(cmd *cobra.Command, args []string) {
+		printBanner()
+
+		cyan := color.New(color.FgCyan, color.Bold)
+		green := color.New(color.FgGreen, color.Bold)
+		yellow := color.New(color.FgYellow)
+		red := color.New(color.FgRed, color.Bold)
+
+		cyan.Println("🔄 Updating Pinakastra to the latest version...")
+		fmt.Println()
+
+		// Run go install command
+		yellow.Println("Downloading and installing latest version...")
+		updateResult := exec.Command("go", "install", "github.com/who0xac/pinakastra/cmd/pinakastra@latest")
+		updateResult.Stdout = os.Stdout
+		updateResult.Stderr = os.Stderr
+
+		if err := updateResult.Run(); err != nil {
+			red.Printf("\n❌ Update failed: %v\n", err)
+			fmt.Println("\nTry running manually:")
+			fmt.Println("  go install github.com/who0xac/pinakastra/cmd/pinakastra@latest")
+			os.Exit(1)
+		}
+
+		fmt.Println()
+		green.Println("✅ Pinakastra updated successfully!")
+		fmt.Println("\nRun 'pinakastra version' to verify the update.")
+	},
+}
+
 func init() {
 	// Initialize config directory on first run
 	configDir, err := config.EnsureConfigDir()
@@ -218,6 +254,7 @@ func init() {
 	rootCmd.AddCommand(scanCmd)
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(checkCmd)
+	rootCmd.AddCommand(updateCmd)
 	// TODO: Implement these later
 	// rootCmd.AddCommand(updateDBCmd)
 	// rootCmd.AddCommand(resumeCmd)

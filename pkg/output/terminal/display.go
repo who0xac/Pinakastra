@@ -60,9 +60,10 @@ func PrintToolRunning(toolName string, elapsed time.Duration) {
 	seconds := int(elapsed.Seconds()) % 60
 	timeStr := fmt.Sprintf("%dm %ds", minutes, seconds)
 
-	fmt.Printf("%s %s is running... %s",
-		Yellow(spinner),
+	fmt.Printf("%s %s is running... %s %s",
+		Yellow("●"),
 		Blue(toolName),
+		Yellow(spinner),
 		White(timeStr))
 }
 

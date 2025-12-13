@@ -34,24 +34,27 @@ Author: %s
 
 // printBanner prints the colorful banner
 func printBanner() {
-	cyan := color.New(color.FgCyan, color.Bold)
-	magenta := color.New(color.FgMagenta, color.Bold)
-	yellow := color.New(color.FgYellow, color.Bold)
-	green := color.New(color.FgGreen)
+	// Dark, attractive colors
+	darkCyan := color.New(color.FgHiCyan, color.Bold)
+	darkMagenta := color.New(color.FgHiMagenta, color.Bold)
+	darkYellow := color.New(color.FgHiYellow, color.Bold)
+	red := color.New(color.FgRed, color.Bold)
+	white := color.New(color.FgHiWhite)
 
-	cyan.Println(`
+	darkCyan.Println(`
 ____  _             _            _
 |  _ \(_)_ __   __ _| | ____ _ __| |_ _ __ __ _
 | |_) | | '_ \ / _' | |/ / _' / __| __| '__/ _' |
 |  __/| | | | | (_| |   < (_| \__ \ |_| | | (_| |
 |_|   |_|_| |_|\__,_|_|\_\__,_|___/\__|_|  \__,_|`)
 
-	magenta.Println("\n🔱 The Ultimate Security Assessment Tool 🔱")
-	yellow.Println("AI-Powered Attack Surface Discovery & Analysis")
+	darkMagenta.Println("\n🔱 The Ultimate Security Assessment Tool 🔱")
+	darkYellow.Println("AI-Powered Attack Surface Discovery & Analysis")
 
 	fmt.Println()
-	green.Printf("Version: %s\n", version)
-	green.Printf("Author: %s\n\n", author)
+	white.Printf("Version: %s\n", version)
+	fmt.Print("Author: ")
+	red.Printf("%s\n\n", author)
 }
 
 var (

@@ -4,5 +4,5 @@ import (
 	"embed"
 )
 
-//go:embed ../../web/templates/* ../../web/static/css/* ../../web/static/js/*
+//go:embed all:../../web
 var WebFiles embed.FS

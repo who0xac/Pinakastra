@@ -35,25 +35,25 @@ Author: %s
 
 // printBanner prints the colorful banner
 func printBanner() {
-	// Dark, attractive colors
-	darkCyan := color.New(color.FgHiCyan, color.Bold)
-	darkMagenta := color.New(color.FgHiMagenta, color.Bold)
-	darkYellow := color.New(color.FgHiYellow, color.Bold)
-	red := color.New(color.FgRed, color.Bold)
-	white := color.New(color.FgHiWhite)
+	// Dark, attractive colors - using regular (darker) versions
+	cyan := color.New(color.FgCyan, color.Bold)      // Deep cyan for ASCII art
+	magenta := color.New(color.FgMagenta, color.Bold) // Deep magenta for title
+	blue := color.New(color.FgBlue, color.Bold)       // Deep blue for subtitle
+	red := color.New(color.FgRed, color.Bold)         // Bold red for author
+	green := color.New(color.FgGreen)                 // Dark green for version
 
-	darkCyan.Println(`
+	cyan.Println(`
 ____  _             _            _
 |  _ \(_)_ __   __ _| | ____ _ __| |_ _ __ __ _
 | |_) | | '_ \ / _' | |/ / _' / __| __| '__/ _' |
 |  __/| | | | | (_| |   < (_| \__ \ |_| | | (_| |
 |_|   |_|_| |_|\__,_|_|\_\__,_|___/\__|_|  \__,_|`)
 
-	darkMagenta.Println("\n🔱 The Ultimate Security Assessment Tool 🔱")
-	darkYellow.Println("AI-Powered Attack Surface Discovery & Analysis")
+	magenta.Println("\n🔱 The Ultimate Security Assessment Tool 🔱")
+	blue.Println("AI-Powered Attack Surface Discovery & Analysis")
 
 	fmt.Println()
-	white.Printf("Version: %s\n", version)
+	green.Printf("Version: %s\n", version)
 	fmt.Print("Author: ")
 	red.Printf("%s\n\n", author)
 }

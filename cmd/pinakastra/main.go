@@ -319,6 +319,7 @@ USAGE:
 COMMANDS:
   scan                 Scan a target domain (default)
   check, c             Check if required tools are installed
+  update, u            Update Pinakastra to latest version
   version              Show version information
 
 REQUIRED:

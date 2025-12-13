@@ -251,7 +251,6 @@ func init() {
 	_ = configDir
 
 	// Add subcommands
-	rootCmd.AddCommand(scanCmd)
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(checkCmd)
 	rootCmd.AddCommand(updateCmd)
@@ -314,10 +313,10 @@ func init() {
 
 const usageTemplate = `
 USAGE:
-  pinakastra [command] [flags]
+  pinakastra -d <domain> [flags]     Scan a target domain
+  pinakastra [command]               Run a command
 
 COMMANDS:
-  scan                 Scan a target domain (default)
   check, c             Check if required tools are installed
   update, u            Update Pinakastra to latest version
   version              Show version information

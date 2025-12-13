@@ -89,7 +89,7 @@ func (g *GAURunner) Run(ctx context.Context) (*GAUResult, error) {
 	// Wait for command to finish
 	if err := cmd.Wait(); err != nil {
 		// GAU might fail, but we continue
-		terminal.PrintToolFailed("GAU", err)
+		terminal.PrintToolFailed("GAU", err, time.Since(start))
 		os.Create(outputFile) // Create empty file
 		return &GAUResult{TotalURLs: 0}, nil
 	}

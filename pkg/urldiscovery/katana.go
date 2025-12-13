@@ -111,7 +111,7 @@ func (k *KatanaRunner) Run(ctx context.Context) (*KatanaResult, error) {
 	// Wait for command to finish
 	if err := cmd.Wait(); err != nil {
 		// Katana might fail, but we continue
-		terminal.PrintToolFailed("Katana", err)
+		terminal.PrintToolFailed("Katana", err, time.Since(start))
 		os.Create(outputFile) // Create empty file
 		return &KatanaResult{TotalURLs: 0}, nil
 	}

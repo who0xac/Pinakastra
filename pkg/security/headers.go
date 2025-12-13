@@ -66,7 +66,7 @@ func (a *Analyzer) AnalyzeHeaders(ctx context.Context, subdomain string) *Header
 	}
 
 	var resp *http.Response
-	var err error
+	_ := error(nil)
 
 	for _, url := range urls {
 		req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
@@ -224,7 +224,7 @@ func (a *Analyzer) checkReferrerPolicy(resp *http.Response, analysis *HeaderAnal
 	if rp == "" {
 		analysis.MissingHeaders = append(analysis.MissingHeaders, "Referrer-Policy")
 		analysis.Recommendations = append(analysis.Recommendations, "Set Referrer-Policy to protect sensitive data in URLs")
-		analysis.Score -= 0.5
+		analysis.Score -= 0
 	} else {
 		analysis.PresentHeaders["Referrer-Policy"] = rp
 

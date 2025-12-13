@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	pinakastra "github.com/who0xac/pinakastra"
 	"github.com/who0xac/pinakastra/pkg/checker"
@@ -29,6 +30,28 @@ Author: %s
 
 `
 )
+
+// printBanner prints the colorful banner
+func printBanner() {
+	cyan := color.New(color.FgCyan, color.Bold)
+	magenta := color.New(color.FgMagenta, color.Bold)
+	yellow := color.New(color.FgYellow, color.Bold)
+	green := color.New(color.FgGreen)
+
+	cyan.Println(`
+____  _             _            _
+|  _ \(_)_ __   __ _| | ____ _ __| |_ _ __ __ _
+| |_) | | '_ \ / _' | |/ / _' / __| __| '__/ _' |
+|  __/| | | | | (_| |   < (_| \__ \ |_| | | (_| |
+|_|   |_|_| |_|\__,_|_|\_\__,_|___/\__|_|  \__,_|`)
+
+	magenta.Println("\n🔱 The Ultimate Security Assessment Tool 🔱")
+	yellow.Println("AI-Powered Attack Surface Discovery & Analysis")
+
+	fmt.Println()
+	green.Printf("Version: %s\n", version)
+	green.Printf("Author: %s\n\n", author)
+}
 
 var (
 	// Global flags
@@ -83,7 +106,7 @@ var scanCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		fmt.Printf(banner, version, author)
+		printBanner()
 		fmt.Printf("Target: %s\n", domain)
 		fmt.Printf("AI Analysis: %v\n", enableAI)
 		fmt.Printf("Web UI: %v\n", webUI)
@@ -162,7 +185,7 @@ var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Show version information",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf(banner, version, author)
+		printBanner()
 	},
 }
 
@@ -172,7 +195,7 @@ var checkCmd = &cobra.Command{
 	Short:   "Check if required tools are installed",
 	Long:    "Verify that all required external tools are installed and accessible",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf(banner, version, author)
+		printBanner()
 		fmt.Println()
 		checker.PrintToolStatus()
 	},

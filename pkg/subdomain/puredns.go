@@ -50,39 +50,46 @@ func (p *PassiveEnumerator) runPuredns(ctx context.Context) ToolResult {
 
 	cmd := exec.CommandContext(ctx, "puredns", args...)
 
-	// Create pipes to capture output
-	stderr, err := cmd.StderrPipe()
-	if err == nil {
-		// Monitor stderr for progress if possible
-		go func() {
-			scanner := bufio.NewScanner(stderr)
-			current := 0
-			ticker := time.NewTicker(100 * time.Millisecond)
-			defer ticker.Stop()
-
-			for scanner.Scan() {
-				line := scanner.Text()
-				// Puredns outputs progress info - try to extract it
-				if strings.Contains(line, "Queried") || strings.Contains(line, "queries") {
-					current++
-					if totalSubdomains > 0 {
-						select {
-						case <-ticker.C:
-							terminal.PrintToolProgress("Puredns", current, totalSubdomains)
-						default:
-						}
-					}
-				}
-			}
-		}()
-	}
-
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		result.Error = fmt.Errorf("puredns failed (optional): %v - %s", err, string(output))
+	// Start the command
+	if err := cmd.Start(); err != nil {
+		result.Error = fmt.Errorf("puredns failed to start (optional): %v", err)
 		result.Duration = time.Since(start)
 		return result
 	}
+
+	// Show animated progress while running
+	done := make(chan error, 1)
+	go func() {
+		done <- cmd.Wait()
+	}()
+
+	// Animate progress
+	ticker := time.NewTicker(1 * time.Second)
+	defer ticker.Stop()
+	elapsed := time.Duration(0)
+
+	for {
+		select {
+		case err := <-done:
+			fmt.Print("\r\033[K") // Clear line
+			if err != nil {
+				result.Error = fmt.Errorf("puredns failed (optional): %v", err)
+				result.Duration = time.Since(start)
+				return result
+			}
+			goto finished
+		case <-ticker.C:
+			elapsed += time.Second
+			terminal.PrintToolRunning("Puredns", elapsed)
+		case <-ctx.Done():
+			cmd.Process.Kill()
+			result.Error = ctx.Err()
+			result.Duration = time.Since(start)
+			return result
+		}
+	}
+
+finished:
 
 	// Clear the progress line
 	fmt.Print("\r\033[K")

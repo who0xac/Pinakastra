@@ -60,8 +60,11 @@ func PrintToolRunning(toolName string, elapsed time.Duration) {
 func PrintToolCompleted(toolName string, count int, duration time.Duration) {
 	// Clear line and print success
 	fmt.Printf("\r\033[K")
-	fmt.Printf("%s %s enumeration complete [%d found] (%.1fs)\n", 
-		Green("●"), toolName, count, duration.Seconds())
+	fmt.Printf("%s %s enumeration complete [%s found] %s\n",
+		Green("✓"),
+		Blue(toolName),
+		Yellow(fmt.Sprintf("%d", count)),
+		White(fmt.Sprintf("(%.1fs)", duration.Seconds())))
 }
 
 // PrintToolFailed prints when a tool fails

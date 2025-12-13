@@ -57,6 +57,7 @@ func (p *PassiveEnumerator) Run(ctx context.Context) ([]string, error) {
 
 	var wg sync.WaitGroup
 	tools := []func(context.Context) ToolResult{
+		p.runAmass,
 		p.runSubfinder,
 		p.runFindomain,
 		p.runAssetfinder,

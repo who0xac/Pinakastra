@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/who0xac/pinakastra/embedded"
 	"github.com/who0xac/pinakastra/pkg/checker"
 	"github.com/who0xac/pinakastra/pkg/config"
 	"github.com/who0xac/pinakastra/pkg/scanner"
@@ -110,7 +111,7 @@ var scanCmd = &cobra.Command{
 		}
 
 		// Create scanner and run
-		s := scanner.NewScanner(config, WebFiles)
+		s := scanner.NewScanner(config, embedded.WebFiles)
 		if err := s.Run(); err != nil {
 			fmt.Printf("Error: %v\n", err)
 			os.Exit(1)

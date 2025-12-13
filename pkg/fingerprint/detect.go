@@ -74,7 +74,7 @@ func (s *Scanner) DetectTechnologies(ctx context.Context, subdomain string) []Te
 		default:
 		}
 
-		req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+		req, err = http.NewRequestWithContext(ctx, "GET", url, nil)
 		if err != nil {
 			continue
 		}

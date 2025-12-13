@@ -69,7 +69,7 @@ func (a *Analyzer) AnalyzeHeaders(ctx context.Context, subdomain string) *Header
 	var err error
 
 	for _, url := range urls {
-		req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+		req, err = http.NewRequestWithContext(ctx, "GET", url, nil)
 		if err != nil {
 			continue
 		}

@@ -44,49 +44,11 @@ func (p *PassiveEnumerator) runPuredns(ctx context.Context) ToolResult {
 
 	cmd := exec.CommandContext(ctx, "puredns", args...)
 
-	// Start the command
-	if err := cmd.Start(); err != nil {
-		result.Error = fmt.Errorf("puredns failed to start (optional): %v", err)
+	if err := cmd.Run(); err != nil {
+		result.Error = fmt.Errorf("puredns failed (optional): %v", err)
 		result.Duration = time.Since(start)
 		return result
 	}
-
-	// Show animated progress while running
-	done := make(chan error, 1)
-	go func() {
-		done <- cmd.Wait()
-	}()
-
-	// Animate progress
-	ticker := time.NewTicker(1 * time.Second)
-	defer ticker.Stop()
-	elapsed := time.Duration(0)
-
-	for {
-		select {
-		case err := <-done:
-			fmt.Print("\r\033[K") // Clear line
-			if err != nil {
-				result.Error = fmt.Errorf("puredns failed (optional): %v", err)
-				result.Duration = time.Since(start)
-				return result
-			}
-			goto finished
-		case <-ticker.C:
-			elapsed += time.Second
-			terminal.PrintToolRunning("Puredns", elapsed)
-		case <-ctx.Done():
-			cmd.Process.Kill()
-			result.Error = ctx.Err()
-			result.Duration = time.Since(start)
-			return result
-		}
-	}
-
-finished:
-
-	// Clear the progress line
-	fmt.Print("\r\033[K")
 
 	subdomains, err := readLinesFromFile(outputFile)
 	if err != nil {

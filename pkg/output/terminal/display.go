@@ -50,10 +50,20 @@ func PrintToolStarting(toolName string, message ...string) {
 func PrintToolRunning(toolName string, elapsed time.Duration) {
 	// Move cursor to beginning of line and clear it
 	fmt.Printf("\r\033[K")
-	
-	// Animated dots based on elapsed time
-	dots := strings.Repeat(".", int(elapsed.Seconds())%4)
-	fmt.Printf("%s %s is running%s", Yellow("●"), toolName, dots)
+
+	// Spinner animation
+	spinners := []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
+	spinner := spinners[int(elapsed.Seconds())%len(spinners)]
+
+	// Format elapsed time
+	minutes := int(elapsed.Minutes())
+	seconds := int(elapsed.Seconds()) % 60
+	timeStr := fmt.Sprintf("%dm %ds", minutes, seconds)
+
+	fmt.Printf("%s %s is running... %s",
+		Yellow(spinner),
+		Blue(toolName),
+		White(timeStr))
 }
 
 // PrintToolCompleted prints when a tool completes successfully

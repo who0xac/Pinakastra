@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"time"
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -222,16 +223,40 @@ var updateCmd = &cobra.Command{
 		cyan.Println("🔄 Updating Pinakastra to the latest version...")
 		fmt.Println()
 
-		// Run go install command
-		yellow.Println("Downloading and installing latest version...")
-		updateResult := exec.Command("go", "install", "github.com/who0xac/pinakastra/cmd/pinakastra@latest")
-		updateResult.Stdout = os.Stdout
-		updateResult.Stderr = os.Stderr
+		// Show progress animation
+		done := make(chan bool)
+		go func() {
+			spinners := []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
+			i := 0
+			for {
+				select {
+				case <-done:
+					fmt.Print("\r\033[K") // Clear line
+					return
+				default:
+					yellow.Printf("\r%s Downloading and installing latest version...", spinners[i%len(spinners)])
+					i++
+					time.Sleep(100 * time.Millisecond)
+				}
+			}
+		}()
 
-		if err := updateResult.Run(); err != nil {
+		// Run go install command with GOPROXY=direct to bypass cache
+		updateResult := exec.Command("go", "install", "github.com/who0xac/pinakastra/cmd/pinakastra@latest")
+		updateResult.Env = append(os.Environ(), "GOPROXY=direct")
+
+		// Suppress stdout/stderr
+		updateResult.Stdout = nil
+		updateResult.Stderr = nil
+
+		err := updateResult.Run()
+		done <- true // Stop spinner
+		time.Sleep(200 * time.Millisecond) // Let spinner finish
+
+		if err != nil {
 			red.Printf("\n❌ Update failed: %v\n", err)
 			fmt.Println("\nTry running manually:")
-			fmt.Println("  go install github.com/who0xac/pinakastra/cmd/pinakastra@latest")
+			fmt.Println("  GOPROXY=direct go install github.com/who0xac/pinakastra/cmd/pinakastra@latest")
 			os.Exit(1)
 		}
 

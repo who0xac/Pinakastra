@@ -84,10 +84,11 @@ var (
 var rootCmd = &cobra.Command{
 	Use:   "pinakastra",
 	Short: "🔱 AI-Powered Attack Surface Discovery & Analysis",
-	Long:  fmt.Sprintf(banner, version, author),
+	Long:  "", // Will be shown via custom help
 	Run: func(cmd *cobra.Command, args []string) {
 		// If no command specified, show help
 		if domain == "" {
+			printBanner()
 			cmd.Help()
 			return
 		}
@@ -309,6 +310,12 @@ func init() {
 
 	// Custom usage template
 	rootCmd.SetUsageTemplate(usageTemplate)
+
+	// Override help command to show colored banner
+	rootCmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
+		printBanner()
+		cmd.Print(cmd.UsageString())
+	})
 }
 
 const usageTemplate = `

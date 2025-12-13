@@ -96,8 +96,6 @@ func (s *Scanner) Run() error {
 				s.log(fmt.Sprintf("Web UI error: %v", err))
 			}
 		}()
-		// Send initial status
-		s.sendStatusUpdate("Initializing", 1, 0, "Scan starting...")
 	}
 
 	// Initialize scan result

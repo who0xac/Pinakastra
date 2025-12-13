@@ -3,7 +3,7 @@
 function dashboard() {
     return {
         // State
-        domain: window.location.hostname || 'target.com',
+        domain: window.PINAKASTRA_DOMAIN || 'target.com',
         theme: localStorage.getItem('theme') || 'dark',
         showExportMenu: false,
         activeTab: 'subdomains',
@@ -27,10 +27,10 @@ function dashboard() {
         },
 
         status: {
-            phase: 'Initializing',
+            phase: 'Waiting',
             phaseNumber: 0,
             progress: 0,
-            message: 'Starting scan...',
+            message: 'Waiting for scan to start...',
             elapsedTime: '0m 0s'
         },
 

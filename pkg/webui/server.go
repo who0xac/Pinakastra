@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -148,8 +149,13 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to load dashboard", http.StatusInternalServerError)
 		return
 	}
+
+	// Replace placeholder with actual domain
+	html := string(data)
+	html = strings.Replace(html, "{{DOMAIN}}", s.domain, 1)
+
 	w.Header().Set("Content-Type", "text/html")
-	w.Write(data)
+	w.Write([]byte(html))
 }
 
 // handleWebSocket handles WebSocket connections

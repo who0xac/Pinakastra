@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"pinakastra/pkg/output/terminal"
+	"github.com/who0xac/pinakastra/pkg/output/terminal"
 )
 
 // KatanaRunner handles Katana URL crawling

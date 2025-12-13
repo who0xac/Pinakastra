@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"pinakastra/pkg/output/terminal"
+	"github.com/who0xac/pinakastra/pkg/output/terminal"
 )
 
 // URLMerger handles merging and deduplication of URLs

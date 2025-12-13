@@ -29,12 +29,6 @@ func (p *PassiveEnumerator) runPuredns(ctx context.Context) ToolResult {
 		return result
 	}
 
-	// Count total lines in wordlist for progress tracking
-	totalSubdomains, err := countFileLines(p.Wordlist)
-	if err != nil {
-		totalSubdomains = 0 // If we can't count, just proceed without progress
-	}
-
 	// Show warning that Puredns may take time due to brute forcing
 	terminal.PrintToolStartingWithWarning("Puredns", "may take time - brute forcing")
 	fmt.Println()

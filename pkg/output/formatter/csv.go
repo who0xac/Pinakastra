@@ -4,7 +4,7 @@ import (
 	"encoding/csv"
 	"os"
 	"path/filepath"
-	"strings"
+	"strconv"
 )
 
 // CSVFormatter handles CSV output

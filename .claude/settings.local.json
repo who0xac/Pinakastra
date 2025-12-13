@@ -16,7 +16,8 @@
       "Bash(git reset:*)",
       "Bash(git rev-parse:*)",
       "Bash(cat:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(git pull:*)"
     ],
     "deny": [],
     "ask": []

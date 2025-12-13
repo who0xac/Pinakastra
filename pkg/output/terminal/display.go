@@ -40,39 +40,22 @@ type ToolStatus struct {
 // PrintToolStarting prints when a tool starts
 func PrintToolStarting(toolName string, message ...string) {
 	if len(message) > 0 {
-		fmt.Printf("%s %s is running (%s)\n", Blue("●"), toolName, message[0])
+		fmt.Printf("%s %s is running (%s)\n", Yellow("●"), Blue(toolName), Yellow(message[0]))
 	} else {
-		fmt.Printf("%s %s is running", Blue("●"), toolName)
+		fmt.Printf("%s %s is running\n", Yellow("●"), Blue(toolName))
 	}
 }
 
-// PrintToolRunning updates the tool status (yellow dot with animation)
+// PrintToolRunning updates the tool status (NOT USED in parallel mode - tools print once)
 func PrintToolRunning(toolName string, elapsed time.Duration) {
-	// Move cursor to beginning of line and clear it
-	fmt.Printf("\r\033[K")
-
-	// Spinner animation
-	spinners := []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
-	spinner := spinners[int(elapsed.Seconds())%len(spinners)]
-
-	// Format elapsed time
-	minutes := int(elapsed.Minutes())
-	seconds := int(elapsed.Seconds()) % 60
-	timeStr := fmt.Sprintf("%dm %ds", minutes, seconds)
-
-	fmt.Printf("%s %s is running... %s %s",
-		Yellow("●"),
-		Blue(toolName),
-		Yellow(spinner),
-		White(timeStr))
+	// This function is no longer used - tools print their start status and that's it
+	// Keeping for backward compatibility but does nothing
 }
 
 // PrintToolCompleted prints when a tool completes successfully
 func PrintToolCompleted(toolName string, count int, duration time.Duration) {
-	// Clear line and print success
-	fmt.Printf("\r\033[K")
 	fmt.Printf("%s %s enumeration complete [%s found] %s\n",
-		Green("✓"),
+		Green("●"),
 		Blue(toolName),
 		Yellow(fmt.Sprintf("%d", count)),
 		White(fmt.Sprintf("(%.1fs)", duration.Seconds())))
@@ -80,10 +63,11 @@ func PrintToolCompleted(toolName string, count int, duration time.Duration) {
 
 // PrintToolFailed prints when a tool fails
 func PrintToolFailed(toolName string, err error, duration time.Duration) {
-	// Clear line and print error
-	fmt.Printf("\r\033[K")
-	fmt.Printf("%s %s failed: %v (%.1fs)\n", 
-		Red("●"), toolName, err, duration.Seconds())
+	fmt.Printf("%s %s failed: %v %s\n",
+		Red("●"),
+		Blue(toolName),
+		Yellow(fmt.Sprintf("%v", err)),
+		White(fmt.Sprintf("(%.1fs)", duration.Seconds())))
 }
 
 // PrintSubdomainSummary prints the final subdomain enumeration summary with tree structure

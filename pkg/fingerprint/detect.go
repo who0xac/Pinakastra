@@ -66,6 +66,7 @@ func (s *Scanner) DetectTechnologies(ctx context.Context, subdomain string) []Te
 	var resp *http.Response
 	var body []byte
 	var err error
+	var req *http.Request
 
 	for _, url := range urls {
 		select {

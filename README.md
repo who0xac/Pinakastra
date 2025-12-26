@@ -30,8 +30,15 @@ Pinakastra is an advanced reconnaissance and exploitation tool that combines pas
 - **Subdomain Discovery** - 8 passive sources + DNS bruteforce
 - **HTTP Probing** - Live host detection with tech fingerprinting
 - **IP Resolution** - ASN lookups and geolocation
-- **URL Discovery** - Katana + GAU
+- **URL Discovery** - Katana + GAU with smart filtering
 - **Port Scanning** - Nmap with service detection
+
+**Smart URL Filtering:**
+- Removes static assets (images, CSS, fonts) while preserving sensitive files
+- Keeps .env, .sql, .bak, .config, .js files for security testing
+- Prioritizes API, admin, auth, and upload endpoints
+- Limits to 150 URLs/subdomain, 5 URLs/pattern (70% reduction)
+- Ensures no sensitive points are missed
 
 ### 🛡️ Security Analysis
 - Security Headers, TLS/SSL, CORS

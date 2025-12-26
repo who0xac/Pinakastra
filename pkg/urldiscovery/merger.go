@@ -46,7 +46,7 @@ func (m *URLMerger) Merge() (*MergeResult, error) {
 	// Regex for valid HTTP/HTTPS URLs
 	urlRegex := regexp.MustCompile(`^https?://`)
 
-	// Regex for excluded extensions
+	// Regex for excluded extensions (basic filtering, smart filter will do more)
 	excludeRegex := regexp.MustCompile(`\.(png|jpg|jpeg|gif|svg|ico|css|woff|woff2|ttf|eot)(\?|$)`)
 
 	// Read and merge URLs
@@ -89,6 +89,30 @@ func (m *URLMerger) Merge() (*MergeResult, error) {
 		}
 	}
 
+	// Apply smart filtering to reduce URL set intelligently
+	beforeFilter := len(allURLs)
+	smartFilter := NewSmartFilter()
+
+	// Group URLs by subdomain for per-subdomain filtering
+	urlsBySubdomain := make(map[string][]string)
+	for _, url := range allURLs {
+		// Extract subdomain from URL
+		if parsedURL, err := parseURL(url); err == nil {
+			subdomain := parsedURL.Host
+			urlsBySubdomain[subdomain] = append(urlsBySubdomain[subdomain], url)
+		}
+	}
+
+	// Apply smart filter per subdomain
+	var filteredURLs []string
+	for _, subdomainURLs := range urlsBySubdomain {
+		filtered := smartFilter.FilterURLs(subdomainURLs)
+		filteredURLs = append(filteredURLs, filtered...)
+	}
+
+	allURLs = filteredURLs
+	afterFilter := len(allURLs)
+
 	// Write merged URLs (even if empty, create the file)
 	output, err := os.Create(outputFile)
 	if err != nil {
@@ -108,14 +132,34 @@ func (m *URLMerger) Merge() (*MergeResult, error) {
 		Duration:   time.Since(start),
 	}
 
-	// Print summary
+	// Print summary with filtering stats
 	if len(allURLs) == 0 {
 		terminal.PrintWarning("No URLs found from any source")
 	} else {
 		terminal.PrintURLDiscoverySummary(liveCount, katanaCount, gauCount, len(allURLs))
+		if beforeFilter > afterFilter {
+			terminal.PrintInfo(fmt.Sprintf("Smart filtering: %d → %d URLs (removed %d static/duplicate URLs)",
+				beforeFilter, afterFilter, beforeFilter-afterFilter))
+		}
 	}
 
 	return result, nil
+}
+
+// parseURL safely parses a URL string and returns a simplified struct
+func parseURL(rawURL string) (*parsedURL, error) {
+	// Simple regex to extract host from URL
+	hostRegex := regexp.MustCompile(`^https?://([^/]+)`)
+	matches := hostRegex.FindStringSubmatch(rawURL)
+	if len(matches) < 2 {
+		return nil, fmt.Errorf("invalid URL")
+	}
+	return &parsedURL{Host: matches[1]}, nil
+}
+
+// parsedURL represents a simplified parsed URL
+type parsedURL struct {
+	Host string
 }
 
 // readURLs reads URLs from a file

@@ -253,12 +253,8 @@ func PrintASNSummaryDetailed(asnInfos []ASNDisplayInfo, totalIPs int) {
 		Cyan(fmt.Sprintf("%d", len(asnInfos))),
 		Cyan(fmt.Sprintf("%d", totalIPs)))
 
-	// Show each ASN with country and sample IPs
-	for i, info := range asnInfos {
-		if i >= 10 { // Show top 10
-			break
-		}
-
+	// Show ALL ASNs (no limit)
+	for _, info := range asnInfos {
 		// Format: AS[Country] - Description [Sample IPs]
 		country := info.Country
 		if country == "" {
@@ -301,18 +297,6 @@ func PrintASNSummaryDetailed(asnInfos []ASNDisplayInfo, totalIPs int) {
 				}
 			}
 		}
-	}
-
-	if len(asnInfos) > 10 {
-		remaining := len(asnInfos) - 10
-		remainingIPs := 0
-		for i := 10; i < len(asnInfos); i++ {
-			remainingIPs += asnInfos[i].IPCount
-		}
-		fmt.Printf("\n   %s ...and %s more ASNs with %s IPs\n",
-			Yellow("⚠"),
-			Yellow(fmt.Sprintf("%d", remaining)),
-			Yellow(fmt.Sprintf("%d", remainingIPs)))
 	}
 	fmt.Println()
 }

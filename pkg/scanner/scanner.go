@@ -586,21 +586,14 @@ func (s *Scanner) runWebSecurityAnalysis(outputPath string, subdomains []string)
 	}
 	close(jobs)
 
-	// Collect results in order
-	resultMap := make(map[string]*subdomainAnalysisResult)
-	for i := 0; i < len(uniqueSubdomains); i++ {
-		result := <-results
-		resultMap[result.subdomain] = result
-	}
-
-	// Print results in original order (line by line)
+	// Print results IMMEDIATELY as they finish (real-time display)
 	totalFindings := 0
 	var criticalCount, highCount, moderateCount, lowCount int
 
-	for _, subdomain := range uniqueSubdomains {
-		result := resultMap[subdomain]
+	for i := 0; i < len(uniqueSubdomains); i++ {
+		result := <-results
 
-		// Print all buffered output for this subdomain
+		// Print output immediately as each subdomain finishes
 		for _, line := range result.output {
 			fmt.Print(line)
 		}

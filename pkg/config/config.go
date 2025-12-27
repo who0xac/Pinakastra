@@ -2,6 +2,8 @@ package config
 
 import (
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 )
@@ -85,10 +87,14 @@ func InitializeDefaultConfigs() error {
 		}
 	}
 
-	// Create subdomains wordlist if it doesn't exist
+	// Download subdomains wordlist if it doesn't exist
 	subdomainsPath := filepath.Join(configDir, "wordlists", "subdomains.txt")
 	if _, err := os.Stat(subdomainsPath); os.IsNotExist(err) {
-		defaultSubdomains := `www
+		// Try to download from SecLists
+		wordlistURL := "https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/DNS/subdomains-top1million-20000.txt"
+		if err := downloadFile(subdomainsPath, wordlistURL); err != nil {
+			// If download fails, create a small default wordlist
+			defaultSubdomains := `www
 api
 mail
 ftp
@@ -119,8 +125,9 @@ media
 upload
 downloads
 `
-		if err := os.WriteFile(subdomainsPath, []byte(defaultSubdomains), 0644); err != nil {
-			return fmt.Errorf("failed to create subdomains.txt: %v", err)
+			if err := os.WriteFile(subdomainsPath, []byte(defaultSubdomains), 0644); err != nil {
+				return fmt.Errorf("failed to create subdomains.txt: %v", err)
+			}
 		}
 	}
 
@@ -173,4 +180,34 @@ func GetConfigPath() (string, error) {
 		return "", err
 	}
 	return filepath.Join(configDir, "config.yaml"), nil
+}
+
+// downloadFile downloads a file from a URL and saves it to the specified path
+func downloadFile(filepath string, url string) error {
+	// Create the file
+	out, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	// Get the data
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	// Check server response
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("bad status: %s", resp.Status)
+	}
+
+	// Write the body to file
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

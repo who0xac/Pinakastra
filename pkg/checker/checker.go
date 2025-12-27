@@ -138,10 +138,7 @@ func CheckTool(tool Tool) ToolStatus {
 
 	status.Installed = true
 	status.Path = path
-
-	// Try to get version
-	version := getToolVersion(tool.Command)
-	status.Version = version
+	status.Version = "installed" // Skip version check for speed
 
 	return status
 }

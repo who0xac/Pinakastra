@@ -75,7 +75,7 @@ pinakastra check
 ### 2. Install Pinakastra
 
 ```bash
-go install github.com/who0xac/pinakastra/cmd/pinakastra@latest
+go install github.com/who0xac/pinakastra/cmd/pinakastra@main
 ```
 
 ### 3. Install AI

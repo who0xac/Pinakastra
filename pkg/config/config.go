@@ -92,7 +92,10 @@ func InitializeDefaultConfigs() error {
 	if _, err := os.Stat(subdomainsPath); os.IsNotExist(err) {
 		// Try to download from SecLists
 		wordlistURL := "https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/DNS/subdomains-top1million-20000.txt"
+		fmt.Printf("📥 Downloading subdomain wordlist (20K entries)...\n")
 		if err := downloadFile(subdomainsPath, wordlistURL); err != nil {
+			fmt.Printf("⚠️  Download failed: %v\n", err)
+			fmt.Printf("📝 Creating fallback wordlist...\n")
 			// If download fails, create a small default wordlist
 			defaultSubdomains := `www
 api
@@ -128,6 +131,8 @@ downloads
 			if err := os.WriteFile(subdomainsPath, []byte(defaultSubdomains), 0644); err != nil {
 				return fmt.Errorf("failed to create subdomains.txt: %v", err)
 			}
+		} else {
+			fmt.Printf("✅ Wordlist downloaded successfully (20,000 subdomains)\n")
 		}
 	}
 
